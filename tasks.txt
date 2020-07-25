@@ -1,0 +1,14 @@
+
+Do zrobienia:
+
+1. Has³o ma siê wyœwietlaæ tylko jednej osobie.
+2. Zrobiæ logowanie
+3. Czyszczenie tablicy u wszystkich przy nowym haœle.
+4. Tylko jedna osoba ma prawo do rysowania.
+5. Tylko osoba rysuj¹ca ma prawo wyczyœciæ tablicê (u wszystkich).
+6. Wysy³anie wiadomoœci po naciœniêciu Enter.
+7. Frontend
+
+
+Problem: User 1 i User 2 maja ró¿ne rozmiary canvasa i rysunek nie mieœci siê w tym mniejszym
+Rozwi¹zanie: poza koordynatami pikseli przesy³aæ te¿ rozmiar p³ótna, na tej podstawie mo¿na przeskalowaæ koordynaty pikseli po drugiej stronie

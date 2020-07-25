@@ -1,0 +1,2 @@
+1. Maybe send antire ImageData inseatd of single strokes? When image is resized users are gonna lose data. 
+2. Canvas image resize: https://gist.github.com/mauriciomassaia/b9e7ef6667a622b104c00249f77f8c03

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>KalamburyPro</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+</head>
+
+<body class="bg-light">
+    <div class="container vh-100">
+        <div class="row h-100 justify-content-center align-items-center">
+            <div class="col-12">
+                <div class="mb-5 row justify-content-center align-items-center">
+                    <div class="h1 text-success">
+                        KalamburyPro
+                    </div>
+                    <img class="ml-3" src="app/res/signature-solid.svg" alt="Logo" width="80">
+                </div>
+                <div class="row justify-content-center">
+                    <form class="col-6">
+                        <div class="input-group input-group-lg">
+                            <input id="username" class="form-control" style="width: 75%; text-align:center;" type="text"
+                                autocomplete="off" placeholder="username">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-dark" type="button" onclick="login()">Login</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="app/service/util-service.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="app/login-component/login.js"></script>
+</body>
+
+</html>

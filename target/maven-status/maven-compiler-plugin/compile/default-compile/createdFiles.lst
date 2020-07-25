@@ -1,0 +1,7 @@
+websocket\DrawWebsocket.class
+service\RandomWordService.class
+websocket\ChatWebsocket.class
+model\Credentials.class
+service\LoginService.class
+rest\LoginRest.class
+rest\RootRest.class
