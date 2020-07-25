@@ -1,12 +1,3 @@
-class Credentials{
-    constructor(username, password) {
-        this.username = username;
-        this.password = password;
-    }
-}
-
-const TOKEN = 'X-Token';
-
 function login() {
     const username = document.getElementById('username').value;
     const credentials = new Credentials(username, 'dummy');
@@ -21,8 +12,8 @@ function login() {
     .then((response) => response.text())
     .then(data => {
         if(data != null) {
-            window.localStorage.setItem(TOKEN, data);
-            window.location.href = 'app/game-component/game.html';
+            window.localStorage.setItem(Util.TOKEN_HEADER, data);
+            window.location.href = Util.ROUTE.GAME;
         } else {
             console.error('Token was null.')
         }

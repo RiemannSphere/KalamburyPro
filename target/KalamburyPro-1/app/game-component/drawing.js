@@ -1,18 +1,3 @@
-// **** CLASSES ****
-class Cartesian {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-}
-class DrawingMessage {
-    constructor(from, to, size) {
-        this.from = from;
-        this.to = to;
-        this.size = size;
-    }
-}
-
 // **** CANVAS INIT ****
 var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
@@ -53,12 +38,16 @@ async function resizeImageData(imageData, width, height) {
     return ctx.getImageData(0, 0, resizeWidth, resizeHeight);
 };
 
+function redirectBackToLoginPage() {
+    window.location.href = Util.ROUTE.LOGIN;
+}
+
 
 // **** WEBSOCKET **** 
 drawingWebSocket.onopen = function (event) {
     // first message is supposed to contain a token
-    console.log('token sent: ', window.localStorage.getItem('X-Token'));
-    drawingWebSocket.send(window.localStorage.getItem('X-Token'));
+    console.log('token sent: ', window.localStorage.getItem(Util.TOKEN_HEADER));
+    drawingWebSocket.send(window.localStorage.getItem(Util.TOKEN_HEADER));
 };
 drawingWebSocket.onmessage = function (event) {
     console.log('Message received from teh server')
@@ -72,9 +61,11 @@ drawingWebSocket.onclose = function (event) {
         // event.code is usually 1006 in this case
         console.log('[close] Connection died');
     }
+    redirectBackToLoginPage();
 };
 drawingWebSocket.onerror = function (event) {
     console.log('WebSocket error observed:', event);
+    redirectBackToLoginPage();
 };
 
 // **** DRAWING **** 

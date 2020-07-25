@@ -11,7 +11,12 @@ const Util = {
     },
     IP: {
         LOCAL: 'localhost'
-    }
+    },
+    ROUTE: {
+        GAME: 'app/game-component/game.html',
+        LOGIN: 'index.html'
+    },
+    TOKEN_HEADER: 'X-Token'
 }
 
 /**

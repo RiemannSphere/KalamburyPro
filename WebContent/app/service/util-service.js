@@ -16,7 +16,7 @@ const Util = {
         GAME: 'app/game-component/game.html',
         LOGIN: 'index.html'
     },
-    TOKEN_HEADER = 'X-Token'
+    TOKEN_HEADER: 'X-Token'
 }
 
 /**
