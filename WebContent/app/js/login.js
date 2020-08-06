@@ -13,7 +13,7 @@ function login() {
     .then(data => {
         if(data != null) {
             window.localStorage.setItem(Util.TOKEN_HEADER, data);
-            window.location.href = 'app/game-component/game.html';
+            window.location.href = Util.ROUTE.Login2Game;
         } else {
             console.error('Token was null.')
         }

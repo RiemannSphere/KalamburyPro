@@ -15,7 +15,7 @@ import service.LoginService;
 
 @Path("/login")
 public class LoginRest {
-	
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -23,10 +23,10 @@ public class LoginRest {
 		System.out.println("Login: " + json);
 		String token = null;
 		try {
-		Jsonb jsonb = JsonbBuilder.create();
-		Credentials user = jsonb.fromJson(json, Credentials.class);
-		token = LoginService.createJwt(user.getUsername());
-		}catch (Exception e) {
+			Jsonb jsonb = JsonbBuilder.create();
+			Credentials user = jsonb.fromJson(json, Credentials.class);
+			token = LoginService.createJwt(user.getUsername());
+		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.serverError().build();
 		}
@@ -34,5 +34,5 @@ public class LoginRest {
 		rb = LoginService.defaultHeaders(rb);
 		return rb.entity(token).build();
 	}
-	
+
 }

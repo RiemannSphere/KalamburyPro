@@ -39,7 +39,7 @@ async function resizeImageData(imageData, width, height) {
 };
 
 function redirectBackToLoginPage() {
-	window.location.href = Util.ROUTE.LOGIN;
+	window.location.href = Util.ROUTE.Game2Login;
 }
 
 

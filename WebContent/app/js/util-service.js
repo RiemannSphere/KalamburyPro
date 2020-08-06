@@ -1,5 +1,5 @@
 const Util = {
-    APP_NAME: 'KalamburyPro-1',
+    APP_NAME: 'KalamburyPro',
     API: {
         REST: 'http',
         WS: 'ws'
@@ -13,8 +13,8 @@ const Util = {
         LOCAL: 'localhost'
     },
     ROUTE: {
-        GAME: 'app/game-component/game.html',
-        LOGIN: 'index.html'
+        Login2Game: 'app/html/game.html',
+        Game2Login: '../../index.html'
     },
     TOKEN_HEADER: 'X-Token'
 }
