@@ -12,8 +12,8 @@ var lastEvent;
 var drawing = false;
 
 // **** WEBSOCKET INIT ****
-const url = buildApiUrl(Util.API.WS, Util.IP.LOCAL, 8080, Util.APP_NAME, Util.RES.DRAW);
-const drawingWebSocket = new WebSocket(url);
+const urlDraw = buildApiUrl(Util.API.WS, Util.IP.LOCAL, 8080, Util.APP_NAME, Util.RES.DRAW);
+const drawingWebSocket = new WebSocket(urlDraw);
 
 // **** WINDOW ****
 window.onresize = async function() {
@@ -46,19 +46,19 @@ function redirectBackToLoginPage() {
 // **** WEBSOCKET **** 
 drawingWebSocket.onopen = function(event) {
 	// first message is supposed to contain a token
-	console.log('token sent: ', window.localStorage.getItem(Util.TOKEN_HEADER));
+	console.log('DrawingWebSocket: token sent: ', window.localStorage.getItem(Util.TOKEN_HEADER));
 	drawingWebSocket.send(window.localStorage.getItem(Util.TOKEN_HEADER));
 };
 drawingWebSocket.onmessage = function(event) {
-	console.log('Message received from teh server');
-	readWebsocketMessage(JSON.parse(event.data));
+	console.log('DrawingWebSocket: Message received from the server');
+	readDrawWebsocketMessage(JSON.parse(event.data));
 };
 drawingWebSocket.onclose = function(event) {
-	console.log(`[close] Connection closed, code=${event.code} reason=${event.reason}`);
+	console.log(`DrawingWebSocket: Connection closed, code=${event.code} reason=${event.reason}`);
 	redirectBackToLoginPage();
 };
 drawingWebSocket.onerror = function(event) {
-	console.log('WebSocket error observed:', event);
+	console.log('DrawingWebSocket: WebSocket error observed:', event);
 	redirectBackToLoginPage();
 };
 
@@ -95,10 +95,13 @@ canvas.onmouseleave = function(event) {
 
 // **** EVENTS HANDLING ****
 
+/**
+ * @param {DrawingMessage} drawingMessage 
+ */
 function onDraw(drawingMessage) {
 	const d = drawingMessage;
 	if (d == null || d.from == null || d.to == null || d.size == null) {
-		console.log('Wrong message!', d);
+		console.log('DrawingWebSocket: Wrong message!', d);
 		return;
 	}
 
@@ -117,9 +120,12 @@ function onDraw(drawingMessage) {
 
 // **** SERVER COMMUNICATION ****
 
-function readWebsocketMessage(msg) {
+/**
+ * @param {DrawingMessage} drawingMessage 
+ */
+function readDrawWebsocketMessage(msg) {
 	if (msg == null) {
-		console.error('[readWebsocketMessage] recieved invalid websocket message');
+		console.error('DrawingWebSocket: [readDrawWebsocketMessage] recieved invalid websocket message');
 		return;
 	}
 	onDraw(msg);
@@ -134,6 +140,9 @@ function sendStroke(from, to, size) {
 	prepareWebsocketMessage(drawingMessage);
 }
 
+/**
+ * @param {DrawingMessage} drawingMessage 
+ */
 function prepareWebsocketMessage(drawingMessage) {
 	if (drawingWebSocket.readyState === drawingWebSocket.OPEN) {
 		drawingWebSocket.send(JSON.stringify(drawingMessage));

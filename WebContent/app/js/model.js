@@ -12,9 +12,22 @@ class DrawingMessage {
     }
 }
 
+class ChatMessage {
+    constructor(msgType, msgContent) {
+        this.msgType = msgType;
+        this.msgContent = msgContent;
+    }
+}
+
+const MsgType = {
+    WORD_TO_GUESS: 'WORD_TO_GUESS',
+    MESSAGE: 'MESSAGE',
+    YOU_GUESSED_IT: 'YOU_GUESSED_IT'
+}
 class Credentials{
     constructor(username, password) {
         this.username = username;
         this.password = password;
     }
 }
+

@@ -16,14 +16,16 @@
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-lg-12 text-center">
-				<div class="h1 text-success">KalamburyPro</div>
+				<div class="h1 text-warning">KalamburyPro</div>
 			</div>
 		</div>
 		<div class="row">
+			<!-- DRAWING -->
 			<div id="canvas-container" class="col-lg-9">
 				<canvas id="canvas" class="bg-light border border-primary rounded"
 					width="800" height="800"></canvas>
 			</div>
+			<!-- MESSAGES -->
 			<div class="col-lg-3">
 				<textarea class="form-control border border-primary rounded" id="messagesTextArea"
 					readonly="readonly" rows="10"></textarea>
@@ -32,7 +34,7 @@
 					size="50" />
 				<input class="form-control" onclick="sendMessage();" value="Send Message"
 					type="button" />
-				<textarea class="form-control" id="randomText" readonly="readonly" rows="1" cols="20"></textarea>
+				<textarea class="form-control" id="wordToGuess" readonly="readonly" rows="1" cols="20"></textarea>
 			</div>
 		</div>
 	</div>
@@ -40,6 +42,7 @@
 	<script src="../js/model.js"></script>
 	<script src="../js/util-service.js"></script>
 	<script src="../js/drawing.js"></script>
+	<script src="../js/chat.js"></script>
 	<!-- Bootstrap JS. -->
 	<script src="../../bootstrap/js/bootstrap.min.js"></script>
 </body>

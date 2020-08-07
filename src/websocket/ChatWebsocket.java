@@ -1,101 +1,96 @@
 package websocket;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
-import javax.json.Json;
-import javax.json.JsonObjectBuilder;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
+import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.OnClose;
-import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import service.RandomWordService;
+import model.ChatMessage;
+import service.ChatService;
+import service.LoginService;
 
 @ServerEndpoint("/chat")
 public class ChatWebsocket {
 
-	static Set<Session> chatroomUsers = Collections.synchronizedSet(new HashSet<Session>());
-	static String wordToGuess = "";
-	String username;
-	
-	private static final String NEXT = "next";
-	private static final String USERNAME = "username";
-	private static final String FIRST_MESSAGE = "FIRST_MESSAGE";
-	private static final String ANSWER = "ANSWER";
-	private static final String WORD = "WORD";
+	private Session session;
+	private boolean isNewSession;
+	private static Set<ChatWebsocket> endpoints = new CopyOnWriteArraySet<>();
+
+	private static ChatWebsocket currentUserDrawing;
+	private static String currentWordToGuess;
 
 	@OnOpen
-	public void handleOpen(Session userSession) throws IOException {
-
-		chatroomUsers.add(userSession);
-		if(wordToGuess == "")
-			wordToGuess = RandomWordService.getNextWord();
-		
+	public void onOpen(Session session) throws IOException {
+		this.session = session;
+		isNewSession = true;
+		if (!endpoints.add(this)) {
+			System.out.println("Session already exists!");
+		}
+		System.out.println("New chat session: " + session.getId() + " (all sessions: " + endpoints.size() + ")");
 	}
 
 	@OnMessage
-	public void handleMessage(String message, Session userSession) throws Exception {
-		Iterator<Session> iterator = chatroomUsers.iterator();
-		username = (String) userSession.getUserProperties().get(USERNAME);
-
-		if (username == null && !message.contains(NEXT)) {
-			String type = FIRST_MESSAGE;
-			userSession.getUserProperties().put(USERNAME, message);
-			userSession.getBasicRemote()
-					.sendText(buildJsonData("System", "nowy uzytkownik: " + message, type, wordToGuess));
+	public void onMessage(Session s, String message) throws IOException {
+		// New session, expecting token in the message
+		// Allow websocket connection only if the token is valid
+		if (isNewSession) {
+			if (LoginService.verifyJwt(message)) {
+				System.out.println("Token valid");
+				startTheGame();
+				isNewSession = false;
+			} else {
+				System.out.println("Token invalid. Closing session...");
+				s.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "Invalid token."));
+			}
 			return;
 		}
-
-		if (!message.equals(wordToGuess) && !message.contains(NEXT)) {
-			String type = ANSWER;
-			while (iterator.hasNext())
-				iterator.next().getBasicRemote().sendText(buildJsonData(username, message, type, wordToGuess));
-			return;
-		}
-
-		if (message.contains(NEXT)) {
-			String type = WORD;
-			wordToGuess = RandomWordService.getNextWord();
-			while (iterator.hasNext())
-				iterator.next().getBasicRemote().sendText(buildJsonData("System", "Nowe has³o!", type, wordToGuess));
-			return;
-		}
-
-		if (message.equals(wordToGuess)) {
-			String type = WORD;
-			wordToGuess = RandomWordService.getNextWord();
-			while (iterator.hasNext())
-				iterator.next().getBasicRemote()
-						.sendText(buildJsonData("System", "Brawo! chodzi³o o " + message, type, wordToGuess));
-			return;
-		}
-	}
-
-	private String buildJsonData(String username, String message, String type, String txt) {
-		JsonObjectBuilder jsonObject = Json.createObjectBuilder();
-		jsonObject.add("message", username + ": " + message);
-		jsonObject.add("type", type);
-		jsonObject.add("txt", txt);
-
-		return jsonObject.build().toString();
-
 	}
 
 	@OnClose
-	public void handleClose(Session userSession) {
-		chatroomUsers.remove(userSession);
-
+	public void onClose(Session session) {
+		System.out.println("Closing session...");
+		this.isNewSession = true;
+		endpoints.remove(this);
 	}
 
-	@OnError
-	public void handleError(Throwable t) {
-		t.printStackTrace();
-	}
+	/**
+	 * If it's start of the game and there are at least 2 players: - generate word
+	 * to guess - choose random player to for drawing - send him word to draw
+	 * @throws IOException
+	 */
+	private void startTheGame() throws IOException {
+		System.out.println(
+				"Is new session: " + isNewSession + "\nUsers: " + endpoints.size() + "\nWord:" + currentWordToGuess);
 
+		if (isNewSession && endpoints.size() > 1 && (currentWordToGuess == null || currentWordToGuess.length() == 0)) {
+			System.out.println("It works!");
+			synchronized (ChatWebsocket.class) {
+				currentWordToGuess = ChatService.nextWordToGuess();
+				int i = 0;
+				int rand = new Random().nextInt(endpoints.size());
+				for (ChatWebsocket user : endpoints) {
+					if (rand == i) {
+						currentUserDrawing = user;
+						break;
+					}
+					i++;
+				}
+				ChatMessage msg = new ChatMessage(ChatMessage.MsgType.WORD_TO_GUESS, currentWordToGuess);
+				Jsonb jsonb = JsonbBuilder.create();
+				String msgJson = jsonb.toJson(msg);
+				currentUserDrawing.session.getBasicRemote().sendText(msgJson);
+				System.out.println("New word to guess: " + currentWordToGuess);
+			}
+		}
+	}
 }
