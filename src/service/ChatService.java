@@ -85,6 +85,10 @@ public class ChatService implements AutoCloseable {
 		return word == null ? false : word.toUpperCase().equals(currentWordToGuess.toUpperCase());
 	}
 	
+	public void cleanCurrentWordToGuess() {
+		currentWordToGuess = null;
+	}
+	
 	@Override
 	public void close() throws Exception {
 		em.close();

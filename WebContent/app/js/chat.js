@@ -56,6 +56,7 @@ function sendMessage() {
     const msgType = MsgType.MESSAGE;
     const msg = new ChatMessage(msgType, msgContent);
     chatWebSocket.send(JSON.stringify(msg));
+    messageTextInput.value = "";
     console.log('ChatWebSocket: Message sent: ', msg);
 }
 
@@ -96,6 +97,11 @@ function onChat(chatMessage) {
 
     if(d.msgType === MsgType.CLEAN_CANVAS) {
         onCleanCanvas();
+        return;
+    }
+
+    if(d.msgType === MsgType.CLEAN_WORD_TO_GUESS) {
+        onNewWordToGuess("");
         return;
     }
 }

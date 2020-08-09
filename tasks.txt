@@ -12,3 +12,6 @@ Do zrobienia:
 
 Problem: User 1 i User 2 maja ró¿ne rozmiary canvasa i rysunek nie mieœci siê w tym mniejszym
 Rozwi¹zanie: poza koordynatami pikseli przesy³aæ te¿ rozmiar p³ótna, na tej podstawie mo¿na przeskalowaæ koordynaty pikseli po drugiej stronie
+
+Problemy 10.08:
+1. Websocket close dla rysuj¹cego usera: metoda nie wykonuje siê przed zamkniêciem w¹tku?

@@ -24,7 +24,8 @@ const MsgType = {
     MESSAGE: 'MESSAGE',
     YOU_GUESSED_IT: 'YOU_GUESSED_IT',
     NEXT_WORD: 'NEXT_WORD', // will also clean canvas
-    CLEAN_CANVAS: 'CLEAN_CANVAS'
+    CLEAN_CANVAS: 'CLEAN_CANVAS',
+    CLEAN_WORD_TO_GUESS: 'CLEAN_WORD_TO_GUESS'
 }
 class Credentials{
     constructor(username, password) {

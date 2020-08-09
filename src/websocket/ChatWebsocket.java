@@ -49,6 +49,16 @@ public class ChatWebsocket {
 			if (LoginService.verifyJwt(message)) {
 				System.out.println("Token valid");
 				isNewSession = false;
+
+				// If there is no currently drawing user or word is not set.
+				if (chatService.getCurrentUserDrawing() == null || chatService.getCurrentWordToGuess() == null) {
+					try {
+						continueTheGame();
+					} catch (IOException e) {
+						System.out.println("Chat Websocket sending message error.");
+						e.printStackTrace();
+					}
+				}
 			} else {
 				System.out.println("Token invalid. Closing session...");
 				try {
@@ -114,6 +124,16 @@ public class ChatWebsocket {
 		} catch (Exception e) {
 			System.out.println("Jsonb cannot be closed.");
 		}
+
+		// If drawing user is gone, get new user and new word
+		if (this.equals(chatService.getCurrentUserDrawing())) {
+			try {
+				continueTheGame();
+			} catch (IOException e) {
+				System.out.println("Chat Websocket sending message error.");
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
@@ -122,8 +142,18 @@ public class ChatWebsocket {
 	 * 
 	 * @throws IOException
 	 */
-	private synchronized void continueTheGame() throws IOException {
+	private void continueTheGame() throws IOException {
 		// Select random user for drawing
+		setRandomUserForDrawing();
+
+		// Send all command to clean current word
+		cleanWordToGuessForAll();
+		
+		// Send him generated word to draw
+		sendNextWordToGuess();
+	}
+
+	private synchronized void setRandomUserForDrawing() {
 		int i = 0;
 		int rand = new Random().nextInt(endpoints.size());
 		for (ChatWebsocket user : endpoints) {
@@ -133,11 +163,18 @@ public class ChatWebsocket {
 			}
 			i++;
 		}
-		
-		// Send him generated word to draw
-		sendNextWordToGuess();
 	}
-
+	
+	private synchronized void cleanWordToGuessForAll() throws IOException {
+		chatService.cleanCurrentWordToGuess();
+		
+		ChatMessage response = new ChatMessage(MsgType.CLEAN_WORD_TO_GUESS, "");
+		String responseJson = jsonb.toJson(response);
+		for (ChatWebsocket user : endpoints) {
+			user.session.getBasicRemote().sendText(responseJson);
+		}
+	}
+	
 	private synchronized void sendNextWordToGuess() throws IOException {
 		chatService.nextWordToGuess();
 		ChatMessage msg = new ChatMessage(MsgType.WORD_TO_GUESS, chatService.getCurrentWordToGuess());
@@ -189,9 +226,7 @@ public class ChatWebsocket {
 		response = new ChatMessage(MsgType.MESSAGE, msg);
 		responseJson = jsonb.toJson(response);
 		for (ChatWebsocket user : endpoints) {
-			if (!user.equals(chatService.getCurrentUserDrawing())) {
-				user.session.getBasicRemote().sendText(responseJson);
-			}
+			user.session.getBasicRemote().sendText(responseJson);
 		}
 	}
 }
