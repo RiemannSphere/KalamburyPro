@@ -22,7 +22,9 @@ class ChatMessage {
 const MsgType = {
     WORD_TO_GUESS: 'WORD_TO_GUESS',
     MESSAGE: 'MESSAGE',
-    YOU_GUESSED_IT: 'YOU_GUESSED_IT'
+    YOU_GUESSED_IT: 'YOU_GUESSED_IT',
+    NEXT_WORD: 'NEXT_WORD', // will also clean canvas
+    CLEAN_CANVAS: 'CLEAN_CANVAS'
 }
 class Credentials{
     constructor(username, password) {

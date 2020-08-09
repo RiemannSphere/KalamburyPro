@@ -1,25 +1,38 @@
 package service;
 
-import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.TypedQuery;
 
 import model.Word;
+import websocket.ChatWebsocket;
 
-public class ChatService {
+public class ChatService implements AutoCloseable {
 
 	private EntityManagerFactory emf;
 	private EntityManager em;
+	
+	private ChatWebsocket currentUserDrawing;
+	private String currentWordToGuess;
 
 	private static ChatService instance;
 
 	private ChatService() {
-
+		
+	}
+	
+	public void setCurrentUserDrawing(ChatWebsocket currentUserDrawing) {
+		this.currentUserDrawing = currentUserDrawing;
+	}
+	
+	public String getCurrentWordToGuess() {
+		return currentWordToGuess;
+	}
+	
+	public ChatWebsocket getCurrentUserDrawing() {
+		return currentUserDrawing;
 	}
 
 	public static ChatService getInstance() {
@@ -40,7 +53,7 @@ public class ChatService {
 		}
 	}
 
-	public String nextWordToGuess() {
+	public void nextWordToGuess() {
 		try {
 			// Min ID
 			Long minId = em.createQuery("SELECT MIN(w.id) FROM Word w", Long.class).getSingleResult();
@@ -58,13 +71,24 @@ public class ChatService {
 				failCounter++;
 			}
 			if (word == null) {
-				return "[ERR] No word found.";
+				currentWordToGuess = "[ERR] No word found.";
 			}
-			return word.getWord();
+			currentWordToGuess =  word.getWord();
 		} catch (Exception e) {
 			System.err.println("Chat Service error during next word generation.");
 			e.printStackTrace();
-			return "[EXCEPTION]";
+			currentWordToGuess =  "[EXCEPTION]";
 		}
 	}
+	
+	public boolean isWordGuessed(String word) {
+		return word == null ? false : word.toUpperCase().equals(currentWordToGuess.toUpperCase());
+	}
+	
+	@Override
+	public void close() throws Exception {
+		em.close();
+		emf.close();
+	}
+	
 }

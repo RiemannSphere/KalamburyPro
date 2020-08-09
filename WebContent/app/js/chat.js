@@ -1,5 +1,6 @@
 const wordToGuessTextArea = document.getElementById('wordToGuess');
 const messagesTextArea = document.getElementById('messagesTextArea');
+const messageTextInput = document.getElementById('messageText');
 
 // **** WEBSOCKET INIT ****
 const urlChat = buildApiUrl(Util.API.WS, Util.IP.LOCAL, 8080, Util.APP_NAME, Util.RES.CHAT);
@@ -26,6 +27,13 @@ chatWebSocket.onerror = function (event) {
     redirectBackToLoginPage();
 };
 
+// **** EVENTS ****
+messageTextInput.onkeyup = function(event) {
+    if(event.keyCode === 13) {
+        sendMessage();
+    }
+}
+
 // **** SERVER COMMUNICATION ****
 
 /**
@@ -40,7 +48,23 @@ function readChatWebsocketMessage(msg) {
 }
 
 function cleanCanvasAndGenerateNewWord() {
-    console.error('ChatWebSocket: cleanCanvasAndGenerateNewWord has not been implemented yet');
+    console.log('ChatWebSocket: cleanCanvasAndGenerateNewWord');
+}
+
+function sendMessage() {
+    const msgContent = messageTextInput.value;
+    const msgType = MsgType.MESSAGE;
+    const msg = new ChatMessage(msgType, msgContent);
+    chatWebSocket.send(JSON.stringify(msg));
+    console.log('ChatWebSocket: Message sent: ', msg);
+}
+
+function cleanCanvas() {
+    const msgContent = "";
+    const msgType = MsgType.CLEAN_CANVAS;
+    const msg = new ChatMessage(msgType, msgContent);
+    chatWebSocket.send(JSON.stringify(msg));
+    console.log('ChatWebSocket: Message sent: ', msg);
 }
 
 // **** EVENTS HANDLING ****
@@ -66,7 +90,12 @@ function onChat(chatMessage) {
     }
 
     if(d.msgType === MsgType.YOU_GUESSED_IT) {
-        onWordGuessSuccess(d.msgContent);
+        onWordGuessSuccess();
+        return;
+    }
+
+    if(d.msgType === MsgType.CLEAN_CANVAS) {
+        onCleanCanvas();
         return;
     }
 }
@@ -85,11 +114,12 @@ function onMessage(msg) {
     messagesTextArea.value += msg + '\n';
 }
 
-/**
- * @param {boolean} wordGuessed 
- */
-function onWordGuessSuccess(wordGuessed) {
-    if(wordGuessed) {
-        cleanCanvasAndGenerateNewWord();
-    }
+function onWordGuessSuccess() {
+    onMessage('Zgadłeś!');
+    cleanCanvasAndGenerateNewWord();
+}
+
+function onCleanCanvas() {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    console.log('Cleaning canvas...');
 }
