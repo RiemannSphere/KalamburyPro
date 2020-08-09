@@ -55,5 +55,10 @@
 			<artifactId>javax.json.bind-api</artifactId>
 			<version>1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>eclipselink</artifactId>
+			<version>2.7.7</version>
+		</dependency>
 	</dependencies>
 </project>

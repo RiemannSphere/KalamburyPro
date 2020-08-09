@@ -1,0 +1,1 @@
+Get-Content words.csv -encoding UTF8 | ForEach-Object {$row=0} {$row++;echo "$row, $_"} > words_with_id.csv

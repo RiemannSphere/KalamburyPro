@@ -28,9 +28,11 @@ public class ChatWebsocket {
 
 	private static ChatWebsocket currentUserDrawing;
 	private static String currentWordToGuess;
+	
+	private static ChatService chatService = ChatService.getInstance();
 
 	@OnOpen
-	public void onOpen(Session session) throws IOException {
+	public void onOpen(Session session) throws IOException {		
 		this.session = session;
 		isNewSession = true;
 		if (!endpoints.add(this)) {
@@ -54,6 +56,8 @@ public class ChatWebsocket {
 			}
 			return;
 		}
+		
+		
 	}
 
 	@OnClose
@@ -73,9 +77,8 @@ public class ChatWebsocket {
 				"Is new session: " + isNewSession + "\nUsers: " + endpoints.size() + "\nWord:" + currentWordToGuess);
 
 		if (isNewSession && endpoints.size() > 1 && (currentWordToGuess == null || currentWordToGuess.length() == 0)) {
-			System.out.println("It works!");
 			synchronized (ChatWebsocket.class) {
-				currentWordToGuess = ChatService.nextWordToGuess();
+				currentWordToGuess = chatService.nextWordToGuess();
 				int i = 0;
 				int rand = new Random().nextInt(endpoints.size());
 				for (ChatWebsocket user : endpoints) {
