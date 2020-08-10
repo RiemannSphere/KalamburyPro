@@ -15,3 +15,7 @@ Rozwi¹zanie: poza koordynatami pikseli przesy³aæ te¿ rozmiar p³ótna, na tej pods
 
 Problemy 10.08:
 1. Websocket close dla rysuj¹cego usera: metoda nie wykonuje siê przed zamkniêciem w¹tku?
+
+Zrób:
+1. Przechowywanie stanu gry (stan p³ótna, lista i rola [rysuje lub nie] u¿ytkowników) 
+2. Lista userów w bazie, pobieraæ ich z bazy. Najpierw zapisywac nowego w bazie, a dopiero potem o pobieraæ. 
