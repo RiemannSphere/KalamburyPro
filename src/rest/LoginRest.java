@@ -41,8 +41,9 @@ public class LoginRest {
 			// 6b. return a token to the user
 			
 			if( loginService.userExistsInDb(user.getUsername()) ) {
-				
+				System.out.println("User " + user.getUsername() + " exists in db.");
 			} else {
+				System.out.println("Creating new user account.");
 				loginService.createNewAccount(user);
 			}
 			

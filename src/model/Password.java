@@ -14,7 +14,7 @@ public class Password {
 
 	@Id
 	@GeneratedValue( strategy= GenerationType.AUTO ) 
-	@Column(name="idu")
+	@Column(name="idp")
 	private Long id;
 	
 	@Column(name="sól")

@@ -1,5 +1,6 @@
 package service;
 
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -8,9 +9,12 @@ import java.util.Date;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import javax.management.Query;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import com.auth0.jwt.JWT;
@@ -88,7 +92,13 @@ public class LoginService implements AutoCloseable {
 	}
 
 	public boolean userExistsInDb(String username) {
-		return false;
+		TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class);
+		try {
+			query.setParameter("username", username).getSingleResult();
+		} catch(NoResultException e) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -115,7 +125,7 @@ public class LoginService implements AutoCloseable {
 		return factory.generateSecret(spec).getEncoded();
 	}
 
-	public void createNewAccount(Credentials user) throws NoSuchAlgorithmException, InvalidKeySpecException {
+	public void createNewAccount(Credentials user) throws NoSuchAlgorithmException, InvalidKeySpecException, UnsupportedEncodingException {
 		byte[] salt = salt();
 		byte[] hash = pbkdf2(user.getPassword(), salt); 
 		
@@ -131,8 +141,8 @@ public class LoginService implements AutoCloseable {
 		
 		// Create Password Entity
 		Password password = new Password();
-		password.setHash(new String(hash));
-		password.setSalt(new String(salt));
+		password.setHash(new String(hash, "UTF-8"));
+		password.setSalt(new String(salt, "UTF-8"));
 		password.setUser(newAccount);
 		
 		// Store Password

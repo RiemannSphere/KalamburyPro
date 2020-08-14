@@ -21,6 +21,8 @@ public class DrawWebsocket {
 	private boolean isNewSession;
 	private static Set<DrawWebsocket> endpoints = new CopyOnWriteArraySet<>();
 
+	private static LoginService loginService = LoginService.getInstance();
+	
 	@OnOpen
 	public void onOpen(Session session) throws IOException {
 		this.session = session;
@@ -36,7 +38,7 @@ public class DrawWebsocket {
 		// New session, expecting token in the message
 		// Allow websocket connection only if the token is valid
 		if(isNewSession) {
-			if(LoginService.verifyJwt(message)) {
+			if(loginService.verifyJwt(message)) {
 				System.out.println("Token valid");
 				isNewSession = false;
 			} else {
