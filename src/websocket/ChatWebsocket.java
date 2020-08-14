@@ -28,6 +28,7 @@ public class ChatWebsocket {
 	private static Set<ChatWebsocket> endpoints = new CopyOnWriteArraySet<>();
 
 	private static ChatService chatService = ChatService.getInstance();
+	private static LoginService loginService = LoginService.getInstance();
 	private Jsonb jsonb;
 
 	@OnOpen
@@ -46,7 +47,7 @@ public class ChatWebsocket {
 		// New session, expecting token in the message
 		// Allow websocket connection only if the token is valid
 		if (isNewSession) {
-			if (LoginService.verifyJwt(message)) {
+			if (loginService.verifyJwt(message)) {
 				System.out.println("Token valid");
 				isNewSession = false;
 

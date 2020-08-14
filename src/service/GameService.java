@@ -2,10 +2,12 @@ package service;
 
 import java.util.List;
 
+import model.User;
+
 public class GameService {
 
 	// game state
-	private List<User> users;
+	// ...
 	
 	private static GameService instance;
 	
