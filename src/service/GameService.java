@@ -5,7 +5,6 @@ import java.util.List;
 public class GameService {
 
 	// game state
-	private List<User> users;
 	
 	private static GameService instance;
 	

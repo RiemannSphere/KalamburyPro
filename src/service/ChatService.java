@@ -80,7 +80,7 @@ public class ChatService implements AutoCloseable {
 			currentWordToGuess =  "[EXCEPTION]";
 		}
 	}
-	
+
 	public boolean isWordGuessed(String word) {
 		return word == null ? false : word.toUpperCase().equals(currentWordToGuess.toUpperCase());
 	}
