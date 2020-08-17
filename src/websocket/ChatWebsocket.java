@@ -7,6 +7,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.OnClose;
@@ -96,7 +98,13 @@ public class ChatWebsocket {
 			} catch (IOException e) {
 				System.out.println("Chat Websocket sending message error.");
 				e.printStackTrace();
-			}
+			}  catch (NoResultException e) {
+				System.out.println("Chat Websocket: there is no drawing user.");
+				e.printStackTrace();
+			}  catch (NonUniqueResultException e) {
+				System.out.println("Chat Websocket: there is more than 1 drawing user.");
+				e.printStackTrace();
+			} 
 		}
 
 		if (msg.getMsgType().equals(MsgType.CLEAN_CANVAS.getValue())) {
@@ -144,12 +152,15 @@ public class ChatWebsocket {
 	 * @throws IOException
 	 */
 	private void continueTheGame() throws IOException {
+		if (endpoints.size() <= 0)
+			return;
+
 		// Select random user for drawing
 		setRandomUserForDrawing();
 
 		// Send all command to clean current word
 		cleanWordToGuessForAll();
-		
+
 		// Send him generated word to draw
 		sendNextWordToGuess();
 	}
@@ -165,17 +176,17 @@ public class ChatWebsocket {
 			i++;
 		}
 	}
-	
+
 	private synchronized void cleanWordToGuessForAll() throws IOException {
 		chatService.cleanCurrentWordToGuess();
-		
+
 		ChatMessage response = new ChatMessage(MsgType.CLEAN_WORD_TO_GUESS, "");
 		String responseJson = jsonb.toJson(response);
 		for (ChatWebsocket user : endpoints) {
 			user.session.getBasicRemote().sendText(responseJson);
 		}
 	}
-	
+
 	private synchronized void sendNextWordToGuess() throws IOException {
 		chatService.nextWordToGuess();
 		ChatMessage msg = new ChatMessage(MsgType.WORD_TO_GUESS, chatService.getCurrentWordToGuess());
@@ -184,13 +195,16 @@ public class ChatWebsocket {
 		System.out.println("New word to guess: " + chatService.getCurrentWordToGuess());
 	}
 
-	private synchronized void processMessage(String msg, Session msgSender) throws IOException {
+	private synchronized void processMessage(String msg, Session msgSender) throws IOException, NoResultException, NonUniqueResultException {
 		System.out.println("Processing message: " + msg);
 		ChatMessage response = null;
 		String responseJson = "";
 
 		// Word has been guessed (not by drawing user)
 		if (chatService.isWordGuessed(msg) && !msgSender.equals(chatService.getCurrentUserDrawing().session)) {
+			// Add points to drawing user
+			chatService.addPointsToDrawingUser(1);
+			
 			// Send message to winning user
 			response = new ChatMessage(MsgType.YOU_GUESSED_IT, "Zgad³eœ!");
 			responseJson = jsonb.toJson(response);

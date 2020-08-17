@@ -19,3 +19,33 @@ Problemy 10.08:
 Zrób:
 1. Przechowywanie stanu gry (stan p³ótna, lista i rola [rysuje lub nie] u¿ytkowników) 
 2. Lista userów w bazie, pobieraæ ich z bazy. Najpierw zapisywac nowego w bazie, a dopiero potem o pobieraæ. 
+
+ZADANIA DO ZROBIENIA NA KONIEC:
+
+Projekt:
+1. Dokumentacja dla jednego modu³u
+2. Klasa testowa w JUnit dla jednego modu³u
+3. Prezentacja w PP
+4. Kupiæ p³ytkê
+
+Programowanie:
+5. Sesja u¿ytkownika (login przy wiadomoœci, zalogowani + status)
+6. Wstrzykiwanie zale¿noœci (serwisy oraz EntityManager)
+7. Kolory w canvasie
+8. Naprawiæ clean canvas (nie dzia³a przy zmianie rozmiaru)
+9. Rysowanie dostêpne tylko dla rysuj¹cego. 
+10. Podpisaæ klasy autorem
+11. Guzik "czyœæ p³ótno" dostêpny tylko dla rysuj¹cego
+12. Chat ma siê scrollowaæ przy nowych wiadomoœciach
+13. Zapis sekretu w bazie
+14. Zapis stanu p³ótna. Nowi u¿ytkownicy nie widz¹ co by³o rysowane wczeœniej.
+
+ad. 5 Zrobione:
+- dodawanie nowych userów
+- sprawdzanie istniej¹cych
+- dodawanie aktywnych do tablicy ActiveUser
+
+Zrób:
+- usuwanie z active na onClose
+- ustaw w bazie isDrawing na true gdy user rysuje
+

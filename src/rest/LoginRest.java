@@ -42,10 +42,15 @@ public class LoginRest {
 			
 			if( loginService.userExistsInDb(user.getUsername()) ) {
 				System.out.println("User " + user.getUsername() + " exists in db.");
+				if(!loginService.auth(user)) {
+					throw new Exception("Password invalid");
+				}
 			} else {
 				System.out.println("Creating new user account.");
 				loginService.createNewAccount(user);
 			}
+			
+			loginService.markUserAsActive(user.getUsername());
 			
 			token = loginService.createJwt(user.getUsername());
 		} catch (Exception e) {

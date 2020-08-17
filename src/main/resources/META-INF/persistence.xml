@@ -10,6 +10,7 @@
 		<non-jta-data-source>jdbc/PostgreSQL</non-jta-data-source>
 		<class>model.Word</class>
 		<class>model.User</class>
+		<class>model.ActiveUser</class>
 		<class>model.Password</class>
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>

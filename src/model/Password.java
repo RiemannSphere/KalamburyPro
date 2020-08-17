@@ -5,8 +5,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name="has³a")
@@ -17,10 +19,13 @@ public class Password {
 	@Column(name="idp")
 	private Long id;
 	
-	@Column(name="sól")
-	private String salt;
+	@Lob
+	@Column(name="sól", length=16)
+	private byte[] salt;
 	
-	private String hash;
+	@Lob
+	@Column(name="hash", length=128)
+	private byte[] hash;
 	
 	@OneToOne
 	private User user;
@@ -37,19 +42,19 @@ public class Password {
 		this.id = id;
 	}
 
-	public String getSalt() {
+	public byte[] getSalt() {
 		return salt;
 	}
 
-	public void setSalt(String salt) {
+	public void setSalt(byte[] salt) {
 		this.salt = salt;
 	}
 
-	public String getHash() {
+	public byte[] getHash() {
 		return hash;
 	}
 
-	public void setHash(String hash) {
+	public void setHash(byte[] hash) {
 		this.hash = hash;
 	}
 

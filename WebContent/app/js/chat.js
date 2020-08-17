@@ -81,6 +81,7 @@ function onChat(chatMessage) {
 	}
 
     if(d.msgType === MsgType.WORD_TO_GUESS) {
+        UserInfo.IS_DRAWING = true;
         onNewWordToGuess(d.msgContent);
         return;
     }
@@ -101,6 +102,7 @@ function onChat(chatMessage) {
     }
 
     if(d.msgType === MsgType.CLEAN_WORD_TO_GUESS) {
+        UserInfo.IS_DRAWING = false;
         onNewWordToGuess("");
         return;
     }

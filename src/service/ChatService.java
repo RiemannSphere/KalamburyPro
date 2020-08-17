@@ -4,8 +4,12 @@ import java.util.Random;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 
+import model.ActiveUser;
 import model.Word;
 import websocket.ChatWebsocket;
 
@@ -87,6 +91,21 @@ public class ChatService implements AutoCloseable {
 	
 	public void cleanCurrentWordToGuess() {
 		currentWordToGuess = null;
+	}
+	
+	public void addPointsToDrawingUser(int points) throws NoResultException, NonUniqueResultException {
+		
+		if(points <= 0)
+			return;
+		
+		//em.getTransaction().begin();
+		
+		// Get drawing active user
+		
+		// Update user with incremented points
+		
+		
+		//em.getTransaction().commit();
 	}
 	
 	@Override
