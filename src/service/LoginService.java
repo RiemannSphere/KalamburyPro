@@ -22,6 +22,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
@@ -86,11 +87,21 @@ public class LoginService implements AutoCloseable {
 			JWTVerifier verifier = JWT.require(algorithm).withIssuer("auth0").build();
 			DecodedJWT jwt = verifier.verify(jwtToken);
 			if (!jwt.getClaim("owner").asString().equals(OWNERS))
-				throw new JWTVerificationException("Token invalid");
+				throw new JWTVerificationException("Owner of a token is invalid.");
 			return true;
 		} catch (JWTVerificationException e) {
 			return false;
 		}
+	}
+	
+	public String extractUsernameFromToken(String jwtToken) {
+		try {
+		    DecodedJWT jwt = JWT.decode(jwtToken);
+		    return jwt.getClaim("username").asString();
+		} catch (JWTDecodeException e){
+		    e.printStackTrace();
+		}
+		return "[INVALID]";
 	}
 
 	public boolean userExistsInDb(String username) {
@@ -113,6 +124,19 @@ public class LoginService implements AutoCloseable {
 			return null;
 		}
 		return user.getId();
+	}
+
+	private ActiveUser getActiveUserFromDb(String username) {
+		ActiveUser user = null;
+
+		TypedQuery<ActiveUser> query = em.createQuery("SELECT au FROM ActiveUser au WHERE au.user.username = :username",
+				ActiveUser.class);
+		try {
+			user = query.setParameter("username", username).getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+		return user;
 	}
 
 	/**
@@ -193,12 +217,12 @@ public class LoginService implements AutoCloseable {
 
 	/**
 	 * Save active user in database
-	 * 
 	 * @param username
+	 * @param chatSessionId
 	 * @return false if something went wrong e.g. user does not exist, transaction
 	 *         failed
 	 */
-	public boolean markUserAsActive(String username) {
+	public boolean markUserAsActive(String username, String chatSessionId) {
 		Long userId = getUserIdFromDb(username);
 		if (userId == null || userId == 0l)
 			return false;
@@ -213,6 +237,7 @@ public class LoginService implements AutoCloseable {
 			// Create active user entity
 			ActiveUser activeUser = new ActiveUser();
 			activeUser.setDrawing(false);
+			activeUser.setChatSessionId(chatSessionId);
 			activeUser.setUser(user);
 
 			em.persist(activeUser);
@@ -223,6 +248,28 @@ public class LoginService implements AutoCloseable {
 			return false;
 		}
 
+		return true;
+	}
+
+	/**
+	 * Remove user from database
+	 * @param username
+	 * @return false is something went wrong
+	 */
+	public boolean markUserAsInactive(String username) {
+		ActiveUser user = getActiveUserFromDb(username);
+
+		if (user == null)
+			return false;
+		
+		try {
+			em.getTransaction().begin();
+			em.remove(user);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 		return true;
 	}
 

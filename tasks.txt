@@ -46,6 +46,12 @@ ad. 5 Zrobione:
 - dodawanie aktywnych do tablicy ActiveUser
 
 Zrób:
-- usuwanie z active na onClose
-- ustaw w bazie isDrawing na true gdy user rysuje
+* cykliczny proces, który uzgadnia stan bazy danych ze stanem gry
+
+B³êdy:
+1. Gdy osoba rysuj¹ca opuszcza grê:
+	a) nie jest losowane nowe has³o
+	b) pozostaje ona aktywna w bazie
+
+
 

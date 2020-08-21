@@ -50,8 +50,6 @@ public class LoginRest {
 				loginService.createNewAccount(user);
 			}
 			
-			loginService.markUserAsActive(user.getUsername());
-			
 			token = loginService.createJwt(user.getUsername());
 		} catch (Exception e) {
 			e.printStackTrace();

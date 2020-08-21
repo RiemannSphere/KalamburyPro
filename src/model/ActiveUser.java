@@ -21,6 +21,9 @@ public class ActiveUser {
 	@Column(name="rysuje")
 	private Boolean isDrawing;
 	
+	@Column(name="id_chat_session")
+	private String chatSessionId;
+	
 	@OneToOne
 	@JoinColumn(name="idu")
 	private User user; 
@@ -52,5 +55,14 @@ public class ActiveUser {
 	public void setUser(User user) {
 		this.user = user;
 	}
+
+	public String getChatSessionId() {
+		return chatSessionId;
+	}
+
+	public void setChatSessionId(String chatSessionId) {
+		this.chatSessionId = chatSessionId;
+	}
+	
 	
 }
