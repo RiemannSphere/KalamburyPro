@@ -5,3 +5,43 @@ body {
 canvas {
     background-color: azure;
 }
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #e6e6e6;
+}
+h2 {
+  background-color: #dbdbdb;
+  margin: 0;
+  margin-bottom: 15px;
+  padding: 10px;
+  font-family: 'Open Sans';
+}
+#color-input {
+  display: none;
+}
+#color-label {
+  margin-left: 15px;
+  position: absolute;
+  height: 30px;
+  width: 50px;
+  border: 2px solid white;
+} 
+#color-input:checked ~ #color-picker {
+  opacity: 1;
+}
+#color-picker {
+  position: relative;
+  left: 70px;
+  transform: translateY(-50%);
+  background-color: white;
+  height: 160px;
+  width: 200px;
+  border: solid 1px #ccc;
+  opacity: 0;
+  padding: 5px;
+}
+canvas:hover {
+  cursor: crosshair;
+}

@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta charset="utf-8">
+	<meta charset="utf-8">
 
-<title>KalamburyPro</title>
-<meta name="description" content="Kalambury">
-<meta name="author" content="Piotr&Maciek">
+	<title>KalamburyPro</title>
+	<meta name="description" content="Kalambury">
+	<meta name="author" content="Piotr&Maciek">
 
-<link rel="stylesheet" href="../css/kalambury.css">
-<!-- Bootstrap CSS -->
-<link rel="stylesheet" href="../../bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../css/kalambury.css">
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="../../bootstrap/css/bootstrap.min.css">
 </head>
+
 <body class="bg-dark">
 
 	<div class="container-fluid">
@@ -22,23 +24,32 @@
 		<div class="row">
 			<!-- DRAWING -->
 			<div id="canvas-container" class="col-lg-9">
-				<canvas id="canvas" class="bg-light border border-primary rounded"
-					width="800" height="800"></canvas>
+				<canvas id="canvas" class="bg-light border border-primary rounded" width="800" height="800"></canvas>
 			</div>
 			<!-- MESSAGES -->
 			<div class="col-lg-3">
-				<textarea class="form-control border border-primary rounded" id="messagesTextArea"
-					readonly="readonly" rows="10"></textarea>
+				<textarea class="form-control border border-primary rounded" id="messagesTextArea" readonly="readonly"
+					rows="10"></textarea>
 				<br>
-				<input class="form-control" id="messageText" type="text"
-					size="50" />
-				<input class="form-control" onclick="sendMessage();" value="Wyślij wiadomość"
-					type="button" />
+				<input class="form-control" id="messageText" type="text" size="50" />
+				<input class="form-control" onclick="sendMessage();" value="Wyślij wiadomość" type="button" />
 				<br>
 				<p class="text-light">Słowo do rysowania:</p>
 				<textarea class="form-control" id="wordToGuess" readonly="readonly" rows="1" cols="20"></textarea>
 				<br>
-				<button type="button" class="btn btn-warning" onclick="cleanCanvas()" >Wyczyść płótno</button>
+				<button type="button" class="btn btn-warning" onclick="cleanCanvas()">Wyczyść płótno</button>
+				<br>
+
+				<!-- Color Picker -->
+				<div>
+					<br>
+					<label for="color-input" id="color-label" style="background-color: rgb(0, 0, 0)"></label>
+					<input type="checkbox" id="color-input" checked></input>
+					<div id="color-picker">
+						<canvas id="color-block" height="150" width="150"></canvas>
+						<canvas id="color-strip" height="150" width="30"></canvas>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -50,4 +61,5 @@
 	<!-- Bootstrap JS. -->
 	<script src="../../bootstrap/js/bootstrap.min.js"></script>
 </body>
+
 </html>

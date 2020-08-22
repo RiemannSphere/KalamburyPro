@@ -5,10 +5,11 @@ class Cartesian {
     }
 }
 class DrawingMessage {
-    constructor(from, to, size) {
+    constructor(from, to, size, color) {
         this.from = from;
         this.to = to;
         this.size = size;
+        this.color = color;
     }
 }
 
@@ -27,7 +28,7 @@ const MsgType = {
     CLEAN_CANVAS: 'CLEAN_CANVAS',
     CLEAN_WORD_TO_GUESS: 'CLEAN_WORD_TO_GUESS'
 }
-class Credentials{
+class Credentials {
     constructor(username, password) {
         this.username = username;
         this.password = password;
