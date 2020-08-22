@@ -31,14 +31,15 @@ Projekt:
 Programowanie:
 5. Sesja u¿ytkownika (login przy wiadomoœci, zalogowani + status)
 6. Wstrzykiwanie zale¿noœci (serwisy oraz EntityManager)
-7. Kolory w canvasie
-8. Naprawiæ clean canvas (nie dzia³a przy zmianie rozmiaru)
 9. Rysowanie dostêpne tylko dla rysuj¹cego. 
 10. Podpisaæ klasy autorem
 11. Guzik "czyœæ p³ótno" dostêpny tylko dla rysuj¹cego
-12. Chat ma siê scrollowaæ przy nowych wiadomoœciach
 13. Zapis sekretu w bazie
 14. Zapis stanu p³ótna. Nowi u¿ytkownicy nie widz¹ co by³o rysowane wczeœniej.
+15. Panel pokazuj¹cy aktywnych u¿ytkowników, ich punkty i status rysowania
+	- MsgType.SCOREBOARD
+	- przesy³a ca³¹ listê aktywnych u¿ytkowników w JSONie
+16. skalowanie gruboœci kreski
 
 ad. 5 Zrobione:
 - dodawanie nowych userów
@@ -52,6 +53,14 @@ B³êdy:
 1. Gdy osoba rysuj¹ca opuszcza grê:
 	a) nie jest losowane nowe has³o
 	b) pozostaje ona aktywna w bazie
+	
+	
+Najnowsze zadania:
+Piotr: 
+	* napisaæ dokumentacjê
+	* wygenerowaæ docsa
+Maciek:
+	* na podstawie dokumentacji zrobiæ prezentacjê
 
 
 

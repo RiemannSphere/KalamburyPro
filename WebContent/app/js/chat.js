@@ -120,6 +120,7 @@ function onNewWordToGuess(word) {
  */
 function onMessage(msg) {
     messagesTextArea.value += msg + '\n';
+    messagesTextArea.scrollTop = messagesTextArea.scrollHeight;
 }
 
 function onWordGuessSuccess() {
@@ -129,5 +130,6 @@ function onWordGuessSuccess() {
 
 function onCleanCanvas() {
     context.clearRect(0, 0, canvas.width, canvas.height);
+    imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     console.log('Cleaning canvas...');
 }
