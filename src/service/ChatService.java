@@ -16,6 +16,10 @@ import model.ActiveUser;
 import model.Word;
 import websocket.ChatWebsocket;
 
+/**
+ * 
+ * @author Maciej Szaba³a
+ */
 public class ChatService implements AutoCloseable {
 
 	private EntityManagerFactory emf;

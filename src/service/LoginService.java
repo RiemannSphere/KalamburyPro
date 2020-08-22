@@ -10,7 +10,6 @@ import java.util.Date;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import javax.management.Query;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
@@ -31,6 +30,10 @@ import model.Credentials;
 import model.Password;
 import model.User;
 
+/**
+ * Consists of methods concerning new account creation, user authentication, users management.
+ * @author Piotr Ko³odziejski
+ */
 public class LoginService implements AutoCloseable {
 
 	private EntityManagerFactory emf;
@@ -47,6 +50,11 @@ public class LoginService implements AutoCloseable {
 
 	}
 
+	/**
+	 * Implementation of the singleton pattern. 
+	 * Creates LoginService object, then initializes persistence layer. 
+	 * @return instance of LoginService
+	 */
 	public static LoginService getInstance() {
 		if (instance == null) {
 			instance = new LoginService();
@@ -55,6 +63,9 @@ public class LoginService implements AutoCloseable {
 		return instance;
 	}
 
+	/**
+	 * Initializes persistence layer, creates EntityManager instance.
+	 */
 	private void initPersistence() {
 		try {
 			emf = Persistence.createEntityManagerFactory("postgres");
@@ -65,10 +76,20 @@ public class LoginService implements AutoCloseable {
 		}
 	}
 
+	/**
+	 * Appends default headers to the server response.
+	 * @param rb response to which append the headers
+	 * @return response with appended headers
+	 */
 	public ResponseBuilder defaultHeaders(ResponseBuilder rb) {
 		return rb.header("Access-Control-Allow-Origin", "*");
 	}
 
+	/**
+	 * Creates and signs a JWT for given user. Appends additional claims like expiration date or owner.
+	 * @param username username name for which create the token
+	 * @return signed token
+	 */
 	public String createJwt(String username) {
 		Algorithm algorithm = Algorithm.HMAC256(secret);
 		try {
@@ -81,6 +102,11 @@ public class LoginService implements AutoCloseable {
 		}
 	}
 
+	/**
+	 * Verifies given token based on secret key, chosen algorithm and owner
+	 * @param jwtToken token to be verified
+	 * @return true if token is valid, false otherwise
+	 */
 	public boolean verifyJwt(String jwtToken) {
 		try {
 			Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -94,6 +120,11 @@ public class LoginService implements AutoCloseable {
 		}
 	}
 	
+	/**
+	 * Decodes JWT, extracts username
+	 * @param jwtToken token
+	 * @return username
+	 */
 	public String extractUsernameFromToken(String jwtToken) {
 		try {
 		    DecodedJWT jwt = JWT.decode(jwtToken);
@@ -104,6 +135,11 @@ public class LoginService implements AutoCloseable {
 		return "[INVALID]";
 	}
 
+	/**
+	 * Checks if given user exists in a database.
+	 * @param username username
+	 * @return true if user exists, false otherwise
+	 */
 	public boolean userExistsInDb(String username) {
 		TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class);
 		try {
@@ -114,6 +150,11 @@ public class LoginService implements AutoCloseable {
 		return true;
 	}
 
+	/**
+	 * Gets user ID from database.
+	 * @param username username
+	 * @return user id in database
+	 */
 	private Long getUserIdFromDb(String username) {
 		User user = null;
 
@@ -126,6 +167,11 @@ public class LoginService implements AutoCloseable {
 		return user.getId();
 	}
 
+	/**
+	 * Gets active user from database.
+	 * @param username username
+	 * @return active user object
+	 */
 	private ActiveUser getActiveUserFromDb(String username) {
 		ActiveUser user = null;
 
@@ -140,7 +186,8 @@ public class LoginService implements AutoCloseable {
 	}
 
 	/**
-	 * @return secure random 16-byte salt
+	 * Generates secure random array of bytes.
+	 * @return 16-byte salt
 	 */
 	private byte[] salt() {
 		SecureRandom rand = new SecureRandom();
@@ -150,8 +197,9 @@ public class LoginService implements AutoCloseable {
 	}
 
 	/**
-	 * @param password
-	 * @param salt
+	 * Generates cryptographic salted hash for given password using PBKDF2 algorithm.
+	 * @param password password
+	 * @param salt salt
 	 * @return secure hash for salted password
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidKeySpecException
@@ -164,6 +212,14 @@ public class LoginService implements AutoCloseable {
 		return factory.generateSecret(spec).getEncoded();
 	}
 
+	/**
+	 * Creates new account for given user. Saves username is a database. Generates salt for given user and stores it in db. 
+	 * Hashes the password and stores it in db.  
+	 * @param user username and password
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeySpecException
+	 * @throws UnsupportedEncodingException
+	 */
 	public void createNewAccount(Credentials user)
 			throws NoSuchAlgorithmException, InvalidKeySpecException, UnsupportedEncodingException {
 		byte[] salt = salt();
@@ -191,6 +247,16 @@ public class LoginService implements AutoCloseable {
 		em.getTransaction().commit();
 	}
 
+	/**
+	 * Processes user authentication. Gets user's salt and hash from db. 
+	 * Using retrieved salt generates hash for password to be authenticated.
+	 * Compares two hashes - one from db, one generated for given password. 
+	 * @param user username and password
+	 * @return true if user has been authenticated, false otherwise
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeySpecException
+	 * @throws UnsupportedEncodingException
+	 */
 	public boolean auth(Credentials user)
 			throws NoSuchAlgorithmException, InvalidKeySpecException, UnsupportedEncodingException {
 		// Get user's id in db
@@ -206,6 +272,11 @@ public class LoginService implements AutoCloseable {
 		return Arrays.equals(hashGenerated, pass.getHash());
 	}
 
+	/**
+	 * Gets password for given user id.
+	 * @param id user id
+	 * @return password from db
+	 */
 	private Password getUserPasswordFromDb(Long id) {
 		TypedQuery<Password> query = em.createQuery("SELECT p FROM Password p WHERE p.user = :user", Password.class);
 		try {
@@ -216,11 +287,10 @@ public class LoginService implements AutoCloseable {
 	}
 
 	/**
-	 * Save active user in database
-	 * @param username
-	 * @param chatSessionId
-	 * @return false if something went wrong e.g. user does not exist, transaction
-	 *         failed
+	 * Saves active user in database.
+	 * @param username User to be set as active
+	 * @param chatSessionId User's session id
+	 * @return false if something went wrong e.g. user does not exist, transaction failed
 	 */
 	public boolean markUserAsActive(String username, String chatSessionId) {
 		Long userId = getUserIdFromDb(username);
@@ -252,8 +322,8 @@ public class LoginService implements AutoCloseable {
 	}
 
 	/**
-	 * Remove user from database
-	 * @param username
+	 * Removes user from database.
+	 * @param username User to be set as inactive
 	 * @return false is something went wrong
 	 */
 	public boolean markUserAsInactive(String username) {
@@ -273,6 +343,9 @@ public class LoginService implements AutoCloseable {
 		return true;
 	}
 
+	/**
+	 * On LoginService close closes all objects used by LoginService.
+	 */
 	@Override
 	public void close() throws Exception {
 		em.close();

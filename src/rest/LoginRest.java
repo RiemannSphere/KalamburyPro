@@ -15,6 +15,9 @@ import model.Password;
 import model.User;
 import service.LoginService;
 
+/**
+ * @author Piotr Ko³odziejski
+ */
 @Path("/login")
 public class LoginRest {
 
