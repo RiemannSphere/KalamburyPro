@@ -8,6 +8,11 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+/**
+ * 
+ * @author Piotr Ko³odziejski
+ *
+ */
 @Entity
 @Table(name="slowa")
 public class Word {

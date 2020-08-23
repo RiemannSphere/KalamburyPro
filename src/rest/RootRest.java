@@ -5,7 +5,7 @@ import javax.ws.rs.core.Application;
 
 /**
  * 
- * @author Piotr Ko³odziejski
+ * @author Maciej Szaba³a
  */
 @ApplicationPath("/rest")
 public class RootRest extends Application {

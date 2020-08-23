@@ -32,7 +32,7 @@ import model.User;
 
 /**
  * Consists of methods concerning new account creation, user authentication, users management.
- * @author Piotr Ko³odziejski
+ * @author Maciej Szaba³a
  */
 public class LoginService implements AutoCloseable {
 
@@ -329,9 +329,11 @@ public class LoginService implements AutoCloseable {
 	public boolean markUserAsInactive(String username) {
 		ActiveUser user = getActiveUserFromDb(username);
 
-		if (user == null)
+		if (user == null) {
+			System.out.println("Login Service: cannot mark null user as inactive.");
 			return false;
-		
+		}
+			
 		try {
 			em.getTransaction().begin();
 			em.remove(user);

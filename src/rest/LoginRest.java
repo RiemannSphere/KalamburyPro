@@ -16,7 +16,7 @@ import model.User;
 import service.LoginService;
 
 /**
- * @author Piotr Ko³odziejski
+ * @author Maciej Szaba³a
  */
 @Path("/login")
 public class LoginRest {

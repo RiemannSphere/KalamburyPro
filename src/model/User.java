@@ -9,6 +9,10 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
+/**
+ * 
+ * @author Maciej Szaba³a
+ */
 @Entity
 @Table(name="u¿ytkownicy")
 public class User {

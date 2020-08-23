@@ -2,10 +2,14 @@ body {
     background-color: rgb(15,15,15);
 }
 
+/* Canvas */
 canvas {
     background-color: azure;
 }
-@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+canvas:hover {
+  cursor: crosshair;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -29,19 +33,54 @@ h2 {
   border: 2px solid white;
 } 
 #color-input:checked ~ #color-picker {
-  opacity: 1;
+  visibility: hidden;
 }
 #color-picker {
-  position: relative;
-  left: 70px;
+  z-index: 1;
+  position: absolute;
+  left: 100px;
   transform: translateY(-50%);
   background-color: white;
   height: 160px;
   width: 200px;
   border: solid 1px #ccc;
-  opacity: 0;
+  visibility: visible;
   padding: 5px;
 }
-canvas:hover {
-  cursor: crosshair;
+
+/* Logout button */
+#logOutBtn {
+  cursor: pointer;
+}
+#logOutBtn:hover {
+  filter: brightness(150%);
+}
+
+/* Scorebeaord button */
+#scoreBtn {
+  cursor: pointer;
+}
+#scoreBtn:hover {
+  filter: brightness(150%);
+}
+
+/* Scoreboard */
+#scoreboard {
+  visibility: hidden;
+  z-index: 1;
+  position: absolute;
+  top: 5px;
+  right: 50%;
+  transform: translateX(50%);
+  color: white;
+  border: 2px solid white;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: black;
+}
+
+#scoreboard ul {
+  list-style-type:none;
+  padding: 0;
+  margin: 0;
 }

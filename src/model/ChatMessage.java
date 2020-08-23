@@ -1,5 +1,9 @@
 package model;
 
+/**
+ * 
+ * @author Piotr Ko³odziejski
+ */
 public class ChatMessage {
 	private String msgType;
 	private String msgContent;

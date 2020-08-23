@@ -1,3 +1,7 @@
+/**
+ * @author Piotr Kołodziejski
+ */
+
 // **** CANVAS INIT ****
 var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
@@ -39,7 +43,11 @@ async function resizeImageData(imageData, width, height) {
 };
 
 function redirectBackToLoginPage() {
+	drawingWebSocket.close();
+	chatWebSocket.close();
+
 	window.location.href = Util.ROUTE.Game2Login;
+	window.localStorage.removeItem(Util.TOKEN_HEADER);
 }
 
 
@@ -154,16 +162,14 @@ colorBlock.onmousemove = function (e) {
 // Main Canvas Events
 
 canvas.onmousedown = function (event) {
-
 	lastEvent = event;
 	drawing = true;
-
 };
 canvas.onmouseup = function (event) {
 	drawing = false;
 };
 canvas.onmousemove = function (event) {
-	if (drawing === true) {
+	if (drawing === true && UserInfo.IS_DRAWING === true) {
 
 		const from = new Cartesian(lastEvent.offsetX, lastEvent.offsetY);
 		const to = new Cartesian(event.offsetX, event.offsetY);

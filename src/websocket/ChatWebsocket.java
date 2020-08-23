@@ -21,9 +21,14 @@ import javax.websocket.server.ServerEndpoint;
 
 import model.ChatMessage;
 import model.ChatMessage.MsgType;
+import model.Score;
 import service.ChatService;
 import service.LoginService;
 
+/**
+ * 
+ * @author Piotr Ko³odziejski
+ */
 @ServerEndpoint("/chat")
 public class ChatWebsocket {
 
@@ -72,6 +77,9 @@ public class ChatWebsocket {
 						e.printStackTrace();
 					}
 				}
+				
+				// Update scoreboard
+				updateScoreboard();
 			} else {
 				System.out.println("Token invalid. Closing session...");
 				try {
@@ -136,14 +144,12 @@ public class ChatWebsocket {
 	@OnClose
 	public void onClose(Session session) {
 		System.out.println("Closing session...");
-		this.isNewSession = true;
-		endpoints.remove(this);
-		try {
-			jsonb.close();
-		} catch (Exception e) {
-			System.out.println("Jsonb cannot be closed.");
-		}
 
+		this.isNewSession = true;
+		
+		// remove session
+		endpoints.remove(this);
+		
 		// If drawing user is gone, get new user and new word
 		if (this.session.equals(chatService.getCurrentUserDrawing())) {
 			try {
@@ -156,6 +162,17 @@ public class ChatWebsocket {
 
 		// Mark user as inactive
 		loginService.markUserAsInactive(username);
+		
+		try {
+			jsonb.close();
+		} catch (Exception e) {
+			System.out.println("Jsonb cannot be closed.");
+		}
+		
+		// Update scoreboard
+		updateScoreboard();
+		
+		System.out.println("Chat Websocket: on close: user " + username + " has been removed.");
 	}
 
 	/**
@@ -187,9 +204,10 @@ public class ChatWebsocket {
 			// Choose random user for drawing
 			String chatSessionId = chatService.setDrawingUserInDb(null);
 			for (ChatWebsocket user : endpoints) {
+				System.out.println(user.session.getId() + " == " + chatSessionId);
 				if( user.session.getId().equals(chatSessionId) ) {
 					chatService.setCurrentUserDrawing(user.session);
-					break;
+					return;
 				}
 			}
 			System.err.println("ChatWebsocket: setNextUserForDrawing: next drawing user has not been set.");
@@ -232,6 +250,9 @@ public class ChatWebsocket {
 		if (chatService.isWordGuessed(msg) && !msgSender.equals(chatService.getCurrentUserDrawing())) {
 			// Add points to the sender
 			chatService.addPointsToTheUser(msgSender.getId(), 1);
+			
+			// Update scoreboard
+			updateScoreboard();
 
 			// Send message to winning user
 			response = new ChatMessage(MsgType.YOU_GUESSED_IT, "Brawo " + username + ", zgad³eœ!");
@@ -270,6 +291,21 @@ public class ChatWebsocket {
 		responseJson = jsonb.toJson(response);
 		for (ChatWebsocket user : endpoints) {
 			user.session.getBasicRemote().sendText(responseJson);
+		}
+	}
+	
+	private void updateScoreboard() {
+		List<Score> scores = chatService.scoreboard();
+		String scoresJson = jsonb.toJson(scores);
+		ChatMessage response = new ChatMessage(MsgType.SCOREBOARD, scoresJson);
+		String responseJson = jsonb.toJson(response);
+		for (ChatWebsocket user : endpoints) {
+			try {
+				user.session.getBasicRemote().sendText(responseJson);
+			} catch (IOException e) {
+				System.out.println("Chat Websocket sending message error.");
+				e.printStackTrace();
+			}
 		}
 	}
 }

@@ -1,3 +1,7 @@
+/**
+ * @author Maciej Szabała
+ */
+
 const Util = {
     APP_NAME: 'KalamburyPro',
     API: {

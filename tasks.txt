@@ -50,9 +50,12 @@ Zrób:
 * cykliczny proces, który uzgadnia stan bazy danych ze stanem gry
 
 B³êdy:
-1. Gdy osoba rysuj¹ca opuszcza grê:
-	a) nie jest losowane nowe has³o
-	b) pozostaje ona aktywna w bazie
+1. Osoba rysuj¹ca nie widzi guzika "Czyœæ p³ótno"
+2. Brakuje guzika "Nastêpne s³owo" dla osoby rysuj¹cej
+3. Uniemo¿liwiæ wybór koloru dla nie-rysuj¹cych
+4. Zbierz 3 powy¿sze w jeden liniowy blok guzików
+5. Frontend: w tabeli wyników Ÿle pokazuje kto rysuje, chyba pokazuje tego, który poprzednio rysowa³,
+rozje¿d¿a siê po zgadniêciu
 	
 	
 Najnowsze zadania:

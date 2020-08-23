@@ -4,6 +4,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.bind.Jsonb;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
@@ -13,12 +19,13 @@ import javax.persistence.TypedQuery;
 import javax.websocket.Session;
 
 import model.ActiveUser;
+import model.Score;
 import model.Word;
 import websocket.ChatWebsocket;
 
 /**
  * 
- * @author Maciej Szaba³a
+ * @author Piotr Ko³odziejski
  */
 public class ChatService implements AutoCloseable {
 
@@ -126,15 +133,18 @@ public class ChatService implements AutoCloseable {
 	/**
 	 * 
 	 * @param chatSessionId
-	 * @return if chatSessionId was null then choose random user for drawing and return its chatSessionId
+	 * @return if chatSessionId was null then choose random user for drawing and
+	 *         return its chatSessionId
 	 */
 	public String setDrawingUserInDb(String chatSessionId) {
 
 		// Get active users
 		List<ActiveUser> users = em.createQuery("SELECT au FROM ActiveUser au", ActiveUser.class).getResultList();
 
-		if (users == null || users.isEmpty())
+		if (users == null || users.isEmpty()) {
+			System.out.println("Chat Service: setDrawingUserInDb: there are no active users");
 			return null;
+		}
 
 		em.getTransaction().begin();
 
@@ -168,6 +178,16 @@ public class ChatService implements AutoCloseable {
 		}
 		em.getTransaction().commit();
 		return null;
+	}
+
+	/**
+	 * 
+	 * @return list of active users and their points
+	 */
+	public List<Score> scoreboard() {
+		return em.createQuery("SELECT au FROM ActiveUser au", ActiveUser.class).getResultList().stream()
+				.map((au) -> new Score(au.getUser().getUsername(), au.isDrawing(), au.getUser().getPoints()))
+				.collect(Collectors.toList());
 	}
 
 	@Override

@@ -14,6 +14,11 @@ import javax.websocket.server.ServerEndpoint;
 
 import service.LoginService;
 
+/**
+ * 
+ * @author User
+ *
+ */
 @ServerEndpoint("/draw")
 public class DrawWebsocket {
 

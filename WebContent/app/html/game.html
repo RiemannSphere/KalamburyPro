@@ -6,7 +6,7 @@
 
 	<title>KalamburyPro</title>
 	<meta name="description" content="Kalambury">
-	<meta name="author" content="Piotr&Maciek">
+	<meta name="author" content="Piotr Kołodziejski">
 
 	<link rel="stylesheet" href="../css/kalambury.css">
 	<!-- Bootstrap CSS -->
@@ -17,8 +17,16 @@
 
 	<div class="container-fluid">
 		<div class="row">
-			<div class="col-lg-12 text-center">
-				<div class="h1 text-warning">KalamburyPro</div>
+			<div class="col-lg-2 text-center my-auto">
+				<button id="logOutBtn" class="btn btn-outline-danger" onclick="redirectBackToLoginPage()">Log Out
+				</button>
+			</div>
+			<div class="col-lg-8 text-center">
+				<div class="h1 text-warning ">KalamburyPro</div>
+			</div>
+			<div class="col-lg-2 text-center my-auto">
+				<button id="scoreBtn" class="btn btn-light" onclick="onScoreboardDisplay()">Scoreboard
+				</button>
 			</div>
 		</div>
 		<div class="row">
@@ -28,6 +36,7 @@
 			</div>
 			<!-- MESSAGES -->
 			<div class="col-lg-3">
+				<!-- Chat -->
 				<textarea class="form-control border border-primary rounded" id="messagesTextArea" readonly="readonly"
 					rows="10"></textarea>
 				<br>
@@ -37,18 +46,24 @@
 				<p class="text-light">Słowo do rysowania:</p>
 				<textarea class="form-control" id="wordToGuess" readonly="readonly" rows="1" cols="20"></textarea>
 				<br>
-				<button type="button" class="btn btn-warning" onclick="cleanCanvas()">Wyczyść płótno</button>
-				<br>
+				<button id="cleanCanvasBtn" type="button" class="btn btn-warning" onclick="cleanCanvas()">Wyczyść
+					płótno</button>
+				<!-- Color Picker Button-->
+				<br><br>
+				<label for="color-input" id="color-label" style="background-color: rgb(0, 0, 0)"></label>
+				<input type="checkbox" id="color-input" checked></input>
+
+				<!-- Relative elements -->
 
 				<!-- Color Picker -->
-				<div>
-					<br>
-					<label for="color-input" id="color-label" style="background-color: rgb(0, 0, 0)"></label>
-					<input type="checkbox" id="color-input" checked></input>
-					<div id="color-picker">
-						<canvas id="color-block" height="150" width="150"></canvas>
-						<canvas id="color-strip" height="150" width="30"></canvas>
-					</div>
+				<div id="color-picker">
+					<canvas id="color-block" height="150" width="150"></canvas>
+					<canvas id="color-strip" height="150" width="30"></canvas>
+				</div>
+
+				<!-- Scoreboard -->
+				<div id="scoreboard">
+					<ul id="usersList" style="visibility: hidden;"></ul>
 				</div>
 			</div>
 		</div>
