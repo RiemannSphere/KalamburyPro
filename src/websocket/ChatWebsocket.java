@@ -66,6 +66,14 @@ public class ChatWebsocket {
 					
 					// Broadcast scoreboard
 					broadcastScoreboard(s);
+					
+					if(activeUserService.doesDrawingUserExist()) {
+						// Check MsgType
+						processBasedOnMsgType(s, message);
+					} else {
+						// There is no drawing user
+						startGame(s);
+					}
 				} else {
 					System.out.println("Token invalid. Closing session...");
 					try {
@@ -96,6 +104,9 @@ public class ChatWebsocket {
 		}
 	}
 	
+	/**
+	 * @param s current user session
+	 */
 	private void broadcastScoreboard(Session s) {
 		List<Score> scores = activeUserService.produceScoreboardForActiveUsers();
 		String scoresJson = jsonb.toJson(scores);
@@ -114,7 +125,40 @@ public class ChatWebsocket {
 	}
 	
 	private void processBasedOnMsgType(Session s, String message) {
+		if (message == null) {
+			System.out.println("Chat Websocket received null message.");
+			return;
+		}
+		
+		// Parse received message
+		final ChatMessage msg = jsonb.fromJson(message, ChatMessage.class);
+		System.out.println("[" + msg.getMsgType() + "] Message received: " + msg.getMsgContent());
+		
+		if (msg.getMsgType().equals(MsgType.MESSAGE.getValue())) {
+			processChatMessage(s, msg.getMsgContent());
+		}
+
+		if (msg.getMsgType().equals(MsgType.CLEAN_CANVAS.getValue())) {
+			System.out.println("Clean Canvas!");
+			// Clean canvas for everybody
+			ChatMessage response = new ChatMessage(MsgType.CLEAN_CANVAS, "");
+			String responseJson = jsonb.toJson(response);
+			for (Session openedSession : s.getOpenSessions()) {
+				try {
+					openedSession.getBasicRemote().sendText(responseJson);
+				} catch (IOException e) {
+					System.out.println("Chat Websocket sending message error.");
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	private void processChatMessage(Session msgSender, String msg) {
 		
 	}
 
+	private void startGame(Session s) {
+		
+	}
 }

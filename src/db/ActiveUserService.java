@@ -95,6 +95,21 @@ public class ActiveUserService implements AutoCloseable {
 				.map((au) -> new Score(au.getUser().getUsername(), au.isDrawing(), au.getUser().getPoints()))
 				.collect(Collectors.toList());
 	}
+	
+	/**
+	 * @return true is drawing user exists, false otherwise
+	 * @throws GameIntegrityViolationException if there is more than one drawing user
+	 */
+	public boolean doesDrawingUserExist() throws GameIntegrityViolationException{
+		try {
+			db.em().createQuery("SELECT au FROM ActiveUser au WHERE au.isDrawing = true", ActiveUser.class).getSingleResult();
+			return true;
+		} catch (NoResultException e) {
+			return false;
+		} catch (NonUniqueResultException e) {
+			throw new GameIntegrityViolationException("More than one drawing user!", e);
+		}
+	}
 
 	@Override
 	public void close() throws Exception {
