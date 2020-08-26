@@ -6,8 +6,10 @@ const wordToGuessTextArea = document.getElementById('wordToGuess');
 const messagesTextArea = document.getElementById('messagesTextArea');
 const messageTextInput = document.getElementById('messageText');
 const cleanCanvasBtn = document.getElementById('cleanCanvasBtn');
-onIsDrawingChange(UserInfo.IS_DRAWING);
 const scoreboard = document.getElementById('scoreboard');
+
+UserInfo.IS_DRAWING = false;
+onIsDrawingChange(UserInfo.IS_DRAWING);
 
 // Active Users List
 var activeUsers;
@@ -98,7 +100,10 @@ function onChat(chatMessage) {
     }
 
     if (d.msgType === MsgType.WORD_TO_GUESS) {
+        // make some elements visible
         UserInfo.IS_DRAWING = true;
+        onIsDrawingChange(UserInfo.IS_DRAWING);
+
         onNewWordToGuess(d.msgContent);
         return;
     }
@@ -119,7 +124,10 @@ function onChat(chatMessage) {
     }
 
     if (d.msgType === MsgType.CLEAN_WORD_TO_GUESS) {
+        // make some elements invisible
         UserInfo.IS_DRAWING = false;
+        onIsDrawingChange(UserInfo.IS_DRAWING);
+
         onNewWordToGuess("");
         return;
     }

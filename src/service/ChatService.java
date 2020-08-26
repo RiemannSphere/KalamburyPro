@@ -100,7 +100,7 @@ public class ChatService implements AutoCloseable {
 	}
 
 	public boolean isWordGuessed(String word) {
-		return word == null ? false : word.toUpperCase().equals(currentWordToGuess.toUpperCase());
+		return word == null ? false : word.trim().toUpperCase().equals(currentWordToGuess.trim().toUpperCase());
 	}
 
 	public void cleanCurrentWordToGuess() {

@@ -25,7 +25,10 @@ public class ActiveUser {
 	@Column(name="rysuje")
 	private Boolean isDrawing;
 	
-	@Column(name="id_chat_session")
+	@Column(name="rysowane_s³owo")
+	private String word;
+	
+	@Column(name="id_sesji")
 	private String chatSessionId;
 	
 	@OneToOne
@@ -68,5 +71,11 @@ public class ActiveUser {
 		this.chatSessionId = chatSessionId;
 	}
 	
+	public String getWord() {
+		return word;
+	}
 	
+	public void setWord(String word) {
+		this.word = word;
+	}
 }

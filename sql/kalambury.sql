@@ -4,6 +4,8 @@ select * from public.użytkownicy;
 
 select * from public.hasła;
 
+select * from public.słownik_aplikacji;
+
 -- Zahaszowane hasła
 select public.użytkownicy.nazwa, encode(public.hasła.hash, 'escape') as hash, encode(public.hasła.sól, 'escape') as sól 
 from public.hasła
@@ -15,3 +17,13 @@ select public.użytkownicy.nazwa, public.użytkownicy.punkty, public.użytkownic
 from public.użytkownicy_aktywni 
 join public.użytkownicy
 on public.użytkownicy_aktywni.idu=public.użytkownicy.idu;
+
+-- Uzupełnij słownik o podstawowe dane aplikacji
+insert into public.słownik_aplikacji (klucz, wartość)
+values ('SECRET', '2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b');
+
+insert into public.słownik_aplikacji (klucz, wartość)
+values ('OWNERS', 'Piotr Kołodziejski, Maciej Szabała');
+
+insert into public.słownik_aplikacji (klucz, wartość)
+values ('EXP_TIME_MILLIS', '86400000');

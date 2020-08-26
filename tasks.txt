@@ -50,13 +50,14 @@ Zrób:
 * cykliczny proces, który uzgadnia stan bazy danych ze stanem gry
 
 B³êdy:
-1. Osoba rysuj¹ca nie widzi guzika "Czyœæ p³ótno"
 2. Brakuje guzika "Nastêpne s³owo" dla osoby rysuj¹cej
 3. Uniemo¿liwiæ wybór koloru dla nie-rysuj¹cych
 4. Zbierz 3 powy¿sze w jeden liniowy blok guzików
-5. Frontend: w tabeli wyników Ÿle pokazuje kto rysuje, chyba pokazuje tego, który poprzednio rysowa³,
-rozje¿d¿a siê po zgadniêciu
-	
+6. Nie pozwól zalogowaæ siê drugi raz tym samym u¿ytkownikiem
+7. B³¹d: po wylogowaniu siê rysuj¹cego (po minimum jednym zgadniêciu) nie zostaje on usuniêty z bazy.
+Nie zostaje wylosowany nowy rysuj¹cy. Wylogowuj¹cy siê rysuj¹cy próbuje wys³aæ nowe has³o do siebie samego.
+Jest to niemo¿liwe, bo jego sesja jest ju¿ zamkniêta.
+-> "next drawing user has not been set"
 	
 Najnowsze zadania:
 Piotr: 
@@ -64,6 +65,37 @@ Piotr:
 	* wygenerowaæ docsa
 Maciek:
 	* na podstawie dokumentacji zrobiæ prezentacjê
+	
+********************************************************
+
+Regular Functions:
+
+* Create Token: (USERNAME, SECRET, OWNER, EXP_TIME) -> JWT
+* Verify Token: (JWT, SECRET, OWNER ) -> boolean
+* Extract Username From Token: (JWT) -> USERNAME
+* Salt: () -> SALT
+* PBKDF2: (PASSWORD, SALT) -> HASH
+* Authenticate: (USERNAME, HASH_FROM_DB, SALT_FROM_DB, PASSWORD_TO_CHECK) -> boolean
+* Is Word Guessed: (WORD, CURRENT_WORD) -> boolean
+
+DB-Involving Functions
+
+* User Exists In DB: (USERNAME) -> boolean 
+* Get User From DB: (USERNAME) -> User
+* Get Active User From DB: (USERNAME) -> ActiveUser
+* Create New Account: (CREDENTIALS, SALT) -> boolean
+* Get Password From DB: (USERNAME) -> Password
+* Mark User As Active: (USERNAME, SESSION_ID) -> boolean
+* Mark User As Inactive: (USERNAME) -> boolean
+* Next Word To Guess: () -> WORD
+* Add Points To User: (SESSION_ID, POINTS) -> boolean
+* Set Drawing User In DB: (SESSION_ID) -> boolean
+* Get Random Active User From DB: () -> ActiveUser //przekazac session id do Set Drawin User In DB
+* Get Scoreboard: () -> List<Score>
+
+Websocket Functions
+
+napisz od nowa ca³y proces...
 
 
 
