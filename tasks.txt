@@ -98,6 +98,5 @@ Websocket Functions
 napisz od nowa ca³y proces...
 
 ZADANIA:
-1. Dokoñcz diagram dla Check MsgType
-2. Zaimplementuj to...
+1. continueGameWithWinner!
 
