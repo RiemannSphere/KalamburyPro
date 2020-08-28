@@ -3,15 +3,9 @@ package websocket;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.stream.Collectors;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.OnClose;
@@ -28,8 +22,6 @@ import model.ActiveUser;
 import model.ChatMessage;
 import model.ChatMessage.MsgType;
 import model.Score;
-import service.ChatService;
-import service.LoginService;
 import service.LoginUtil;
 
 /**
@@ -100,7 +92,41 @@ public class ChatWebsocket {
 	}
 
 	@OnClose
-	public void onClose(Session session) {
+	public void onClose(Session session) throws GameIntegrityViolationException {
+		System.out.println("ChatWebsocket closing session...");
+		// Mark user as inactive
+		activeUserService.removeActiveUser(session.getId());
+		
+		// If this was not the last active user
+		if (activeUserService.getActiveUsers().size() > 0) {
+			// Find drawing user. Retry few times in case of GameIntegrityViolationException
+			ActiveUser drawingUser = null;
+
+			int numOfRetry = dictService.getNumberOfRetries();
+			int retryFreq = dictService.getRetryFrequency();
+			for (int i = 0; i != numOfRetry; i++) {
+				try {
+					drawingUser = activeUserService.getActiveDrawingUser();
+				} catch (GameIntegrityViolationException e) {
+					try {
+						Thread.sleep(retryFreq);
+					} catch (InterruptedException e2) {
+						e2.printStackTrace();
+					}
+				}
+			}
+
+			// In case there is no drawing user and this is not the last user, start game
+			// from random user.
+			if (drawingUser == null) {
+				System.err.println("Chat Websocket: on close: unable to get drawing user!");
+				startGame(session);
+			}
+
+			// Broadcast scoreboard
+			broadcastScoreboard(session);
+		}
+
 		try {
 			jsonb.close();
 		} catch (Exception e) {
@@ -118,7 +144,8 @@ public class ChatWebsocket {
 		String responseJson = jsonb.toJson(response);
 		for (Session openedSession : s.getOpenSessions()) {
 			try {
-				openedSession.getBasicRemote().sendText(responseJson);
+				if (openedSession.isOpen())
+					openedSession.getBasicRemote().sendText(responseJson);
 			} catch (IOException e) {
 				System.out.println("Chat Websocket: broadcastScoreboard: sending message error.");
 				e.printStackTrace();
@@ -135,6 +162,7 @@ public class ChatWebsocket {
 		}
 
 		// Parse received message
+		System.out.println("ChatWebsocket: message precessed: " + message);
 		final ChatMessage msg = jsonb.fromJson(message, ChatMessage.class);
 		System.out.println("[" + msg.getMsgType() + "] Message received: " + msg.getMsgContent());
 
@@ -149,7 +177,8 @@ public class ChatWebsocket {
 			String responseJson = jsonb.toJson(response);
 			for (Session openedSession : s.getOpenSessions()) {
 				try {
-					openedSession.getBasicRemote().sendText(responseJson);
+					if (openedSession.isOpen())
+						openedSession.getBasicRemote().sendText(responseJson);
 				} catch (IOException e) {
 					System.out.println("Chat Websocket: clean canvas: sending message error.");
 					e.printStackTrace();
@@ -190,7 +219,8 @@ public class ChatWebsocket {
 				for (Session openedSession : msgSender.getOpenSessions()) {
 					if (!openedSession.equals(msgSender)) {
 						try {
-							openedSession.getBasicRemote().sendText(responseJson);
+							if (openedSession.isOpen())
+								openedSession.getBasicRemote().sendText(responseJson);
 						} catch (IOException e) {
 							System.out.println("Chat Websocket: broadcast winner info: sending message error");
 							e.printStackTrace();
@@ -203,7 +233,8 @@ public class ChatWebsocket {
 				responseJson = jsonb.toJson(response);
 				for (Session openedSession : msgSender.getOpenSessions()) {
 					try {
-						openedSession.getBasicRemote().sendText(responseJson);
+						if (openedSession.isOpen())
+							openedSession.getBasicRemote().sendText(responseJson);
 					} catch (IOException e) {
 						System.out.println("Chat Websocket: clean canvas for all: sending message error");
 						e.printStackTrace();
@@ -226,7 +257,8 @@ public class ChatWebsocket {
 		String responseJson = jsonb.toJson(response);
 		for (Session openedSession : s.getOpenSessions()) {
 			try {
-				openedSession.getBasicRemote().sendText(responseJson);
+				if (openedSession.isOpen())
+					openedSession.getBasicRemote().sendText(responseJson);
 			} catch (IOException e) {
 				System.out.println("Chat Websocket: pass regular message: sending message error");
 				e.printStackTrace();
@@ -244,11 +276,67 @@ public class ChatWebsocket {
 		// Set new drawing user in database. Set also new word to guess
 		activeUserService.setDrawingUserAndNewWord(newDrawingUser, newWord);
 
+		// Clean word to guess for all
+		ChatMessage response = new ChatMessage(MsgType.CLEAN_WORD_TO_GUESS, "");
+		String responseJson = jsonb.toJson(response);
+		for (Session openedSession : s.getOpenSessions()) {
+			try {
+				if (openedSession.isOpen())
+					openedSession.getBasicRemote().sendText(responseJson);
+			} catch (IOException e) {
+				System.out.println("Chat Websocket: clean word to guess: sending message error");
+				e.printStackTrace();
+			}
+		}
+
+		// Notify new drawing user and send him word to draw
+		ChatMessage msg = new ChatMessage(MsgType.WORD_TO_GUESS, newWord);
+		String msgJson = jsonb.toJson(msg);
+
+		for (Session openedSession : s.getOpenSessions()) {
+			if (openedSession.getId().equals(newDrawingUser.getChatSessionId())) {
+				try {
+					if (openedSession.isOpen())
+						openedSession.getBasicRemote().sendText(msgJson);
+				} catch (IOException e) {
+					System.out.println("Chat Websocket: send word to guess: sending message error");
+					e.printStackTrace();
+				}
+			}
+		}
+
+		// Broadcast scoreboard
+		broadcastScoreboard(s);
+	}
+
+	private void continueGameWithWinner(Session winner) {
+		// Get winner by his session id
+		ActiveUser newDrawingUser = activeUserService.getActiveUserBySessionId(winner.getId());
+
+		// Get random word
+		String newWord = wordService.getRandomWord();
+
+		// Set new drawing user in database. Set also new word to guess
+		activeUserService.setDrawingUserAndNewWord(newDrawingUser, newWord);
+
+		// Clean word to guess for all
+		ChatMessage response = new ChatMessage(MsgType.CLEAN_WORD_TO_GUESS, "");
+		String responseJson = jsonb.toJson(response);
+		for (Session openedSession : winner.getOpenSessions()) {
+			try {
+				if (openedSession.isOpen())
+					openedSession.getBasicRemote().sendText(responseJson);
+			} catch (IOException e) {
+				System.out.println("Chat Websocket: clean word to guess: sending message error");
+				e.printStackTrace();
+			}
+		}
+		
 		// Notify new drawing user and send him word to draw
 		ChatMessage msg = new ChatMessage(MsgType.WORD_TO_GUESS, newWord);
 		String msgJson = jsonb.toJson(msg);
 		try {
-			Session newDrawing = s.getOpenSessions().stream()
+			Session newDrawing = winner.getOpenSessions().stream()
 					.filter((session) -> session.getId().equals(newDrawingUser.getChatSessionId())).findFirst().get();
 			newDrawing.getBasicRemote().sendText(msgJson);
 		} catch (NoSuchElementException e) {
@@ -258,22 +346,6 @@ public class ChatWebsocket {
 		}
 
 		// Broadcast scoreboard
-		broadcastScoreboard(s);
-
-		// Clean word to guess for all
-		ChatMessage response = new ChatMessage(MsgType.CLEAN_WORD_TO_GUESS, "");
-		String responseJson = jsonb.toJson(response);
-		for (Session openedSession : s.getOpenSessions()) {
-			try {
-				openedSession.getBasicRemote().sendText(responseJson);
-			} catch (IOException e) {
-				System.out.println("Chat Websocket: clean word to guess: sending message error");
-				e.printStackTrace();
-			}
-		}
-	}
-
-	private void continueGameWithWinner(Session winner) {
-
+		broadcastScoreboard(winner);
 	}
 }

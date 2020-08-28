@@ -1,13 +1,20 @@
 package db;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 
 import exception.GameIntegrityViolationException;
+import model.Password;
 import model.User;
+import service.LoginUtil;
 
 public class UserService {
 
+	private LoginUtil loginUtil = LoginUtil.getInstance();
 	private Database db;
 
 	private static UserService instance;
@@ -26,7 +33,7 @@ public class UserService {
 			instance = new UserService();
 		return instance;
 	}
-	
+
 	/**
 	 * @param username
 	 * @return user object
@@ -42,5 +49,57 @@ public class UserService {
 			throw new GameIntegrityViolationException("User is not unique!", e);
 		}
 	}
-	
+
+	/**
+	 * @param username
+	 * @return true if user exists in db
+	 * @throws GameIntegrityViolationException in case user is not unique in db
+	 */
+	public boolean userExistsInDb(String username) throws GameIntegrityViolationException {
+		try {
+			db.em().createQuery("SELECT u from User u WHERE u.username = :username", User.class)
+					.setParameter("username", username).getSingleResult();
+			return true;
+		} catch (NoResultException e) {
+			return false;
+		} catch (NonUniqueResultException e) {
+			throw new GameIntegrityViolationException("User is not unique!", e);
+		}
+	}
+
+	/**
+	 * Creates new account for given user. Saves username in a database. Generates
+	 * salt for given user and stores it in db. Hashes the password and stores it in
+	 * db.
+	 * 
+	 * @param username
+	 * @param password
+	 * @throws GameIntegrityViolationException if pbkdf2 was implemented incorrectly
+	 */
+	public void createNewUser(String username, String password) throws GameIntegrityViolationException {
+		byte[] salt = loginUtil.salt();
+		byte[] hash = loginUtil.pbkdf2(password, salt);
+
+		db.em().getTransaction().begin();
+
+		// Create User Entity
+		User newAccount = new User();
+		newAccount.setUsername(username);
+		newAccount.setPoints(0);
+
+		// Store User
+		db.em().persist(newAccount);
+
+		// Create Password Entity
+		Password pass = new Password();
+		pass.setHash(hash);
+		pass.setSalt(salt);
+		pass.setUser(newAccount);
+
+		// Store Password
+		db.em().persist(pass);
+
+		db.em().getTransaction().commit();
+	}
+
 }

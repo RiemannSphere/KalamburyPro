@@ -45,10 +45,38 @@ public class AppDictionaryService {
 	 * @return expiration time of a JWT in milliseconds
 	 * @throws GameIntegrityViolationException key does not exist or is not unique
 	 */
-	public String getExpirationTime() throws GameIntegrityViolationException {
-		return getValueForKey("EXP_TIME_MILLIS");
+	public long getExpirationTime() throws GameIntegrityViolationException {
+		try {
+			return Long.parseLong(getValueForKey("EXP_TIME_MILLIS"));
+		} catch(NumberFormatException e) {
+			throw new GameIntegrityViolationException("Expiration time is not of type long. Error in db.", e);
+		} 
+	}
+	
+	/**
+	 * @return number of retries
+	 * @throws GameIntegrityViolationException key does not exist or is not unique, also when value is not an integer
+	 */
+	public int getNumberOfRetries() throws GameIntegrityViolationException {
+		try {
+			return Integer.parseInt(getValueForKey("NUM_OF_RETRY"));
+		} catch(NumberFormatException e) {
+			throw new GameIntegrityViolationException("Number of retries is not an integer. Error in db.", e);
+		} 
 	}
 
+	/**
+	 * @return retry frequency in milliseconds
+	 * @throws GameIntegrityViolationException key does not exist or is not unique
+	 */
+	public int getRetryFrequency() throws GameIntegrityViolationException {
+		try {
+			return Integer.parseInt(getValueForKey("RETRY_FREQ_IN_MILLIS"));
+		} catch(NumberFormatException e) {
+			throw new GameIntegrityViolationException("Retry frequency is not an integer. Error in db.", e);
+		} 
+	}
+	
 	/**
 	 * 
 	 * @param key key in dictionary table

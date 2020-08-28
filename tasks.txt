@@ -65,38 +65,5 @@ Piotr:
 	* wygenerowaæ docsa
 Maciek:
 	* na podstawie dokumentacji zrobiæ prezentacjê
-	
-********************************************************
 
-Regular Functions:
-
-* Create Token: (USERNAME, SECRET, OWNER, EXP_TIME) -> JWT
-* Verify Token: (JWT, SECRET, OWNER ) -> boolean
-* Extract Username From Token: (JWT) -> USERNAME
-* Salt: () -> SALT
-* PBKDF2: (PASSWORD, SALT) -> HASH
-* Authenticate: (USERNAME, HASH_FROM_DB, SALT_FROM_DB, PASSWORD_TO_CHECK) -> boolean
-* Is Word Guessed: (WORD, CURRENT_WORD) -> boolean
-
-DB-Involving Functions
-
-* User Exists In DB: (USERNAME) -> boolean 
-* Get User From DB: (USERNAME) -> User
-* Get Active User From DB: (USERNAME) -> ActiveUser
-* Create New Account: (CREDENTIALS, SALT) -> boolean
-* Get Password From DB: (USERNAME) -> Password
-* Mark User As Active: (USERNAME, SESSION_ID) -> boolean
-* Mark User As Inactive: (USERNAME) -> boolean
-* Next Word To Guess: () -> WORD
-* Add Points To User: (SESSION_ID, POINTS) -> boolean
-* Set Drawing User In DB: (SESSION_ID) -> boolean
-* Get Random Active User From DB: () -> ActiveUser //przekazac session id do Set Drawin User In DB
-* Get Scoreboard: () -> List<Score>
-
-Websocket Functions
-
-napisz od nowa ca³y proces...
-
-ZADANIA:
-1. continueGameWithWinner!
 

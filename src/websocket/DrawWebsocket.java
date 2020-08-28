@@ -12,7 +12,8 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import service.LoginService;
+import db.AppDictionaryService;
+import service.LoginUtil;
 
 /**
  * 
@@ -22,11 +23,11 @@ import service.LoginService;
 @ServerEndpoint("/draw")
 public class DrawWebsocket {
 
+	private AppDictionaryService dictService = AppDictionaryService.getInstance();
+	private LoginUtil loginUtil = LoginUtil.getInstance();
 	private Session session;
 	private boolean isNewSession;
 	private static Set<DrawWebsocket> endpoints = new CopyOnWriteArraySet<>();
-
-	private static LoginService loginService = LoginService.getInstance();
 	
 	@OnOpen
 	public void onOpen(Session session) throws IOException {
@@ -43,11 +44,11 @@ public class DrawWebsocket {
 		// New session, expecting token in the message
 		// Allow websocket connection only if the token is valid
 		if(isNewSession) {
-			if(loginService.verifyJwt(message)) {
-				System.out.println("Token valid");
+			if(loginUtil.verifyJwt(message, dictService.getSecret(), dictService.getOwners())) {
+				System.out.println("DrawWebsocket: Token valid");
 				isNewSession = false;
 			} else {
-				System.out.println("Token invalid. Closing session...");
+				System.out.println("DrawWebsocket: Token invalid. Closing session...");
 				s.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "Invalid token."));
 			}
 			return;
@@ -66,7 +67,7 @@ public class DrawWebsocket {
 
 	@OnClose
 	public void onClose(Session session) {
-		System.out.println("Closing session...");
+		System.out.println("DrawWebsocket: Closing session...");
 		this.isNewSession = true;
 		endpoints.remove(this);
 	}

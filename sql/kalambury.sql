@@ -6,6 +6,18 @@ select * from public.hasła;
 
 select * from public.słownik_aplikacji;
 
+select * from public.slowa;
+
+-- Usuń tabele poza wymaganymi
+drop table public.użytkownicy_aktywni;
+drop table public.hasła;
+drop table public.użytkownicy;
+drop table public.sequence;
+
+-- Usuwanie danych
+delete from public.użytkownicy_aktywni 
+where idau='2';
+
 -- Zahaszowane hasła
 select public.użytkownicy.nazwa, encode(public.hasła.hash, 'escape') as hash, encode(public.hasła.sól, 'escape') as sól 
 from public.hasła
@@ -27,3 +39,9 @@ values ('OWNERS', 'Piotr Kołodziejski, Maciej Szabała');
 
 insert into public.słownik_aplikacji (klucz, wartość)
 values ('EXP_TIME_MILLIS', '86400000');
+
+insert into public.słownik_aplikacji (klucz, wartość)
+values ('NUM_OF_RETRY', '5');
+
+insert into public.słownik_aplikacji (klucz, wartość)
+values ('RETRY_FREQ_IN_MILLIS', '1000');

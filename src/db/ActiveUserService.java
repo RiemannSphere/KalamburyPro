@@ -20,7 +20,6 @@ public class ActiveUserService implements AutoCloseable {
 	private Database db = Database.getInstance();
 	private UserService userService = UserService.getInstance();
 	private GameUtil gameUtil = GameUtil.getInstance();
-	private ActiveUserService activeUserService = ActiveUserService.getInstance();
 
 	private static ActiveUserService instance;
 
@@ -91,12 +90,26 @@ public class ActiveUserService implements AutoCloseable {
 
 	}
 
+	public void removeActiveUser(String sessionId) {
+		ActiveUser user = null;
+		try {
+			user = getActiveUserBySessionId(sessionId);
+		} catch (GameIntegrityViolationException e) {
+			System.out.println("ActiveUserService: removeActiveUser: user already removed");
+			return;
+		}
+		System.out.println("ActiveUserService: removing user " + user.getUser().getUsername());
+		db.em().getTransaction().begin();
+		db.em().remove(user);
+		db.em().getTransaction().commit();
+	}
+
 	/**
 	 * 
 	 * @return list of active users and their points
 	 */
 	public List<Score> produceScoreboardForActiveUsers() {
-		return gameUtil.produceScoreboard(getActivUsers());
+		return gameUtil.produceScoreboard(getActiveUsers());
 	}
 
 	/**
@@ -156,7 +169,7 @@ public class ActiveUserService implements AutoCloseable {
 	/**
 	 * @return all active users
 	 */
-	public List<ActiveUser> getActivUsers() {
+	public List<ActiveUser> getActiveUsers() {
 		return db.em().createQuery("SELECT au FROM ActiveUser au", ActiveUser.class).getResultList();
 	}
 
@@ -202,7 +215,7 @@ public class ActiveUserService implements AutoCloseable {
 	 * @return random active user
 	 */
 	public ActiveUser getRandomActiveUser() {
-		List<ActiveUser> users = getActivUsers();
+		List<ActiveUser> users = getActiveUsers();
 		int rand = new Random().nextInt(users.size());
 		return users.get(rand);
 	}
@@ -214,43 +227,65 @@ public class ActiveUserService implements AutoCloseable {
 		List<ActiveUser> drawingUsers = db.em()
 				.createQuery("SELECT au FROM ActiveUser au WHERE au.isDrawing = true", ActiveUser.class)
 				.getResultList();
-		
+
 		db.em().getTransaction().begin();
-		
-		for(ActiveUser u : drawingUsers) {
+
+		for (ActiveUser u : drawingUsers) {
 			u.setDrawing(false);
 			u.setWord(null);
 			db.em().merge(u);
 		}
-		
+
 		db.em().getTransaction().commit();
 	}
-	
+
 	/**
 	 * @param user to be set as drawing
 	 * @param word new word to guess
-	 * @throws GameIntegrityViolationException when either user is null or word is invalid
+	 * @throws GameIntegrityViolationException when either user is null or word is
+	 *                                         invalid
 	 */
-	public void setDrawingUserAndNewWord(ActiveUser user, String word) throws GameIntegrityViolationException{
-		if(user == null)
+	public void setDrawingUserAndNewWord(ActiveUser user, String word) throws GameIntegrityViolationException {
+		if (user == null)
 			throw new GameIntegrityViolationException("Cannot set null user as drawing!");
-		
-		if(gameUtil.isWordInvalid(word))
+
+		if (gameUtil.isWordInvalid(word))
 			throw new GameIntegrityViolationException("Cannot set invalid word!");
-		
+
 		// Before setting new drawing user and new word
 		// unset all users to not drawing state and unset previous words to guess.
-		activeUserService.unsetDrawingStateForAllAndUnsetWords();
-		
+		unsetDrawingStateForAllAndUnsetWords();
+
 		db.em().getTransaction().begin();
-		
+
 		ActiveUser foundUser = db.em().find(ActiveUser.class, user.getIdau());
 		foundUser.setDrawing(true);
 		foundUser.setWord(word);
-		
+
 		db.em().merge(foundUser);
-		
+
 		db.em().getTransaction().commit();
+	}
+
+	/**
+	 * @param sessionId
+	 * @return active user
+	 * @throws GameIntegrityViolationException in case session id is null, empty or
+	 *                                         blank
+	 */
+	public ActiveUser getActiveUserBySessionId(String sessionId) throws GameIntegrityViolationException {
+		if (sessionId == null || sessionId.isEmpty() || sessionId.trim().isEmpty())
+			throw new GameIntegrityViolationException("Cannot get active user for null, empty or blank session id!");
+
+		try {
+			return db.em()
+					.createQuery("SELECT au FROM ActiveUser au WHERE au.chatSessionId = :sessionId", ActiveUser.class)
+					.setParameter("sessionId", sessionId).getSingleResult();
+		} catch (NoResultException e) {
+			throw new GameIntegrityViolationException("Active user with given session id does not exist!", e);
+		} catch (NonUniqueResultException e) {
+			throw new GameIntegrityViolationException("Active user session id is not unique!", e);
+		}
 	}
 
 	@Override
