@@ -1,5 +1,9 @@
 package model;
 
+/**
+ * 
+ * @author Piotr Ko³odziejski
+ */
 public class Credentials {
 	private String username;
 	private String password;

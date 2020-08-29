@@ -1,3 +1,7 @@
+/**
+ * @author Maciej Szabała
+ */
+
 const Util = {
     APP_NAME: 'KalamburyPro',
     API: {
@@ -17,7 +21,13 @@ const Util = {
         Game2Login: '../../index.html'
     },
     TOKEN_HEADER: 'X-Token'
-}
+};
+
+// Current state of a user
+const UserInfo = {
+    USERNAME: '',
+    IS_DRAWING: false
+};
 
 /**
  * Use Util object to build URL easier.

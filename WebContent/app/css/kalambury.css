@@ -2,6 +2,85 @@ body {
     background-color: rgb(15,15,15);
 }
 
+/* Canvas */
 canvas {
     background-color: azure;
+}
+canvas:hover {
+  cursor: crosshair;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #e6e6e6;
+}
+h2 {
+  background-color: #dbdbdb;
+  margin: 0;
+  margin-bottom: 15px;
+  padding: 10px;
+  font-family: 'Open Sans';
+}
+#color-input {
+  display: none;
+}
+#color-label {
+  margin-left: 15px;
+  position: absolute;
+  height: 30px;
+  width: 50px;
+  border: 2px solid white;
+} 
+#color-input:checked ~ #color-picker {
+  visibility: hidden;
+}
+#color-picker {
+  z-index: 1;
+  position: absolute;
+  left: 100px;
+  transform: translateY(-50%);
+  background-color: white;
+  height: 160px;
+  width: 200px;
+  border: solid 1px #ccc;
+  visibility: visible;
+  padding: 5px;
+}
+
+/* Logout button */
+#logOutBtn {
+  cursor: pointer;
+}
+#logOutBtn:hover {
+  filter: brightness(150%);
+}
+
+/* Scorebeaord button */
+#scoreBtn {
+  cursor: pointer;
+}
+#scoreBtn:hover {
+  filter: brightness(150%);
+}
+
+/* Scoreboard */
+#scoreboard {
+  visibility: hidden;
+  z-index: 1;
+  position: absolute;
+  top: 5px;
+  right: 50%;
+  transform: translateX(50%);
+  color: white;
+  border: 2px solid white;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: black;
+}
+
+#scoreboard ul {
+  list-style-type:none;
+  padding: 0;
+  margin: 0;
 }

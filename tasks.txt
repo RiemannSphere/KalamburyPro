@@ -31,6 +31,7 @@ Projekt:
 Programowanie:
 5. Sesja u¿ytkownika (login przy wiadomoœci, zalogowani + status)
 6. Wstrzykiwanie zale¿noœci (serwisy oraz EntityManager)
+<<<<<<< HEAD
 7. Kolory w canvasie
 8. Naprawiæ clean canvas (nie dzia³a przy zmianie rozmiaru)
 9. Rysowanie dostêpne tylko dla rysuj¹cego. 
@@ -38,3 +39,41 @@ Programowanie:
 11. Guzik "czyœæ p³ótno" dostêpny tylko dla rysuj¹cego
 12. Chat ma siê scrollowaæ przy nowych wiadomoœciach
 13. Zapis sekretu w bazie
+=======
+9. Rysowanie dostêpne tylko dla rysuj¹cego. 
+10. Podpisaæ klasy autorem
+11. Guzik "czyœæ p³ótno" dostêpny tylko dla rysuj¹cego
+13. Zapis sekretu w bazie
+14. Zapis stanu p³ótna. Nowi u¿ytkownicy nie widz¹ co by³o rysowane wczeœniej.
+15. Panel pokazuj¹cy aktywnych u¿ytkowników, ich punkty i status rysowania
+	- MsgType.SCOREBOARD
+	- przesy³a ca³¹ listê aktywnych u¿ytkowników w JSONie
+16. skalowanie gruboœci kreski
+
+ad. 5 Zrobione:
+- dodawanie nowych userów
+- sprawdzanie istniej¹cych
+- dodawanie aktywnych do tablicy ActiveUser
+
+Zrób:
+* cykliczny proces, który uzgadnia stan bazy danych ze stanem gry
+
+B³êdy:
+2. Brakuje guzika "Nastêpne s³owo" dla osoby rysuj¹cej
+3. Uniemo¿liwiæ wybór koloru dla nie-rysuj¹cych
+4. Zbierz 3 powy¿sze w jeden liniowy blok guzików
+6. Nie pozwól zalogowaæ siê drugi raz tym samym u¿ytkownikiem
+7. B³¹d: po wylogowaniu siê rysuj¹cego (po minimum jednym zgadniêciu) nie zostaje on usuniêty z bazy.
+Nie zostaje wylosowany nowy rysuj¹cy. Wylogowuj¹cy siê rysuj¹cy próbuje wys³aæ nowe has³o do siebie samego.
+Jest to niemo¿liwe, bo jego sesja jest ju¿ zamkniêta.
+-> "next drawing user has not been set"
+	
+Najnowsze zadania:
+Piotr: 
+	* napisaæ dokumentacjê
+	* wygenerowaæ docsa
+Maciek:
+	* na podstawie dokumentacji zrobiæ prezentacjê
+
+
+>>>>>>> refs/remotes/origin/code_refactorization

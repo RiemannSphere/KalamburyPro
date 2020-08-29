@@ -1,5 +1,9 @@
 package model;
 
+/**
+ * 
+ * @author Piotr Ko³odziejski
+ */
 public class ChatMessage {
 	private String msgType;
 	private String msgContent;
@@ -19,7 +23,8 @@ public class ChatMessage {
 		YOU_GUESSED_IT("YOU_GUESSED_IT"),
 		NEXT_WORD("NEXT_WORD"),
 		CLEAN_CANVAS("CLEAN_CANVAS"),
-		CLEAN_WORD_TO_GUESS("CLEAN_WORD_TO_GUESS");
+		CLEAN_WORD_TO_GUESS("CLEAN_WORD_TO_GUESS"),
+		SCOREBOARD("SCOREBOARD");
 
 		private String value;
 

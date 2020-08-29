@@ -9,6 +9,10 @@
 		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 		<non-jta-data-source>jdbc/PostgreSQL</non-jta-data-source>
 		<class>model.Word</class>
+		<class>model.User</class>
+		<class>model.ActiveUser</class>
+		<class>model.Password</class>
+		<class>model.AppDictionary</class>
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="eclipselink.ddl-generation"
