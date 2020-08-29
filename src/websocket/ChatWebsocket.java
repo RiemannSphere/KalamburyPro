@@ -25,6 +25,10 @@ import model.Score;
 import service.LoginUtil;
 
 /**
+ * This websocket contains main logic of an app. It authenticates user after
+ * session is opened, then processes incoming messages. Class is responsible for
+ * generating new words to guess and choosing next drawing user. It also
+ * produces scoreboard.
  * 
  * @author Piotr Ko³odziejski
  */
@@ -39,11 +43,27 @@ public class ChatWebsocket {
 
 	private String username;
 
+	/**
+	 * Initial procedures when websocket session is opened.
+	 * 
+	 * @param session current session
+	 */
 	@OnOpen
-	public void onOpen(Session session) throws IOException {
+	public void onOpen(Session session) {
 		jsonb = JsonbBuilder.create();
 	}
 
+	/**
+	 * Proceeds incoming websocket messages. On very first message it expects JWT
+	 * token to authenticate the user. If user is not valid it closes the session.
+	 * Messages are processed based on message type (see enum ChatMessage.MsgType).
+	 * Method contaings main logic: processing messages, adding active users,
+	 * generating new word, choosing next drawing users, closing session in case of
+	 * fatal internal errors.
+	 * 
+	 * @param s       current websocket session
+	 * @param message incoming message
+	 */
 	@OnMessage
 	public void onMessage(Session s, String message) {
 		try {
@@ -91,12 +111,23 @@ public class ChatWebsocket {
 		}
 	}
 
+	/**
+	 * Method is being invoked when websocket session is closed. It removes user
+	 * from active users. In case drawing user is leaving the game it ensures that
+	 * next drawing user is chosen.
+	 * 
+	 * @param session current session
+	 * @throws GameIntegrityViolationException in case of error during word
+	 *                                         generation, setting new drawing user,
+	 *                                         setting new word to guess or
+	 *                                         obtaining data from app dictionary.
+	 */
 	@OnClose
 	public void onClose(Session session) throws GameIntegrityViolationException {
 		System.out.println("ChatWebsocket closing session...");
 		// Mark user as inactive
 		activeUserService.removeActiveUser(session.getId());
-		
+
 		// If this was not the last active user
 		if (activeUserService.getActiveUsers().size() > 0) {
 			// Find drawing user. Retry few times in case of GameIntegrityViolationException
@@ -135,7 +166,10 @@ public class ChatWebsocket {
 	}
 
 	/**
-	 * @param s current user session
+	 * Broadcast scoreboard to all the users. Display users, their points and
+	 * whether they are drawing or not.
+	 * 
+	 * @param s current websocket session
 	 */
 	private void broadcastScoreboard(Session s) {
 		List<Score> scores = activeUserService.produceScoreboardForActiveUsers();
@@ -155,6 +189,12 @@ public class ChatWebsocket {
 		System.out.println("Chat Websocket: scoreboard has been updated!");
 	}
 
+	/**
+	 * Process message based on its type (ChatMessage.MsgType)
+	 * 
+	 * @param s       current websocket session
+	 * @param message message to be processed
+	 */
 	private void processBasedOnMsgType(Session s, String message) {
 		if (message == null) {
 			System.out.println("Chat Websocket received null message.");
@@ -187,6 +227,22 @@ public class ChatWebsocket {
 		}
 	}
 
+	/**
+	 * Checks if the word has been guessed. Guessing by drawing user does not count.
+	 * Adds points to winning user in case he guessed the word. Broadcasts messages
+	 * to all the users when word has been guessed. Continues the game by choosing
+	 * winner for drawing next word. Broadcasts scoreboard. In case the word has not
+	 * been guessed broadcasts the message as a regular chat message without
+	 * processing.
+	 * 
+	 * @param msgSender messages sender session
+	 * @param msg       message to be processed
+	 * @throws GameIntegrityViolationException in case of internal inconsistency
+	 *                                         e.g. there is zero or more than one
+	 *                                         drawing user, there is more than one
+	 *                                         user with certain session id, winning
+	 *                                         user is not an active user.
+	 */
 	private void processChatMessage(Session msgSender, String msg) throws GameIntegrityViolationException {
 		// Has word been guessed?
 		if (activeUserService.hasWordBeenGuessed(msg)) {
@@ -252,6 +308,12 @@ public class ChatWebsocket {
 		}
 	}
 
+	/**
+	 * Broadcasts regular chat message. Adds username of a message sender.
+	 * 
+	 * @param s   current websocket session
+	 * @param msg message to be sent to other users
+	 */
 	private void broadcastMessage(Session s, String msg) {
 		ChatMessage response = new ChatMessage(MsgType.MESSAGE, username + ": " + msg);
 		String responseJson = jsonb.toJson(response);
@@ -266,6 +328,16 @@ public class ChatWebsocket {
 		}
 	}
 
+	/**
+	 * Starting game means choosing random user and sending him random word to
+	 * guess. Game is started when there was no previous drawing user i.e. it is
+	 * first user in the game or drawing user has left the game.
+	 * 
+	 * @param s current websocket session
+	 * @throws GameIntegrityViolationException in case of error during word
+	 *                                         generation, setting new drawing user
+	 *                                         or setting new word to guess.
+	 */
 	private void startGame(Session s) throws GameIntegrityViolationException {
 		// Get random active user to draw
 		ActiveUser newDrawingUser = activeUserService.getRandomActiveUser();
@@ -309,6 +381,11 @@ public class ChatWebsocket {
 		broadcastScoreboard(s);
 	}
 
+	/**
+	 * Continuing game means the next drawing user is the user who won last turn.
+	 * 
+	 * @param winner user who guessed previous word
+	 */
 	private void continueGameWithWinner(Session winner) {
 		// Get winner by his session id
 		ActiveUser newDrawingUser = activeUserService.getActiveUserBySessionId(winner.getId());
@@ -331,7 +408,7 @@ public class ChatWebsocket {
 				e.printStackTrace();
 			}
 		}
-		
+
 		// Notify new drawing user and send him word to draw
 		ChatMessage msg = new ChatMessage(MsgType.WORD_TO_GUESS, newWord);
 		String msgJson = jsonb.toJson(msg);

@@ -16,8 +16,9 @@ import db.AppDictionaryService;
 import service.LoginUtil;
 
 /**
+ * Websocket used for passing drawn image to other users.
  * 
- * @author User
+ * @author Maciej Szaba³a
  *
  */
 @ServerEndpoint("/draw")
@@ -28,12 +29,12 @@ public class DrawWebsocket {
 	private Session session;
 	private boolean isNewSession;
 	private static Set<DrawWebsocket> endpoints = new CopyOnWriteArraySet<>();
-	
+
 	@OnOpen
 	public void onOpen(Session session) throws IOException {
 		this.session = session;
 		isNewSession = true;
-		if(!endpoints.add(this)) {
+		if (!endpoints.add(this)) {
 			System.out.println("Session already exists!");
 		}
 		System.out.println("New draw session: " + session.getId() + " (all sessions: " + endpoints.size() + ")");
@@ -43,8 +44,8 @@ public class DrawWebsocket {
 	public void onMessage(Session s, String message) throws IOException {
 		// New session, expecting token in the message
 		// Allow websocket connection only if the token is valid
-		if(isNewSession) {
-			if(loginUtil.verifyJwt(message, dictService.getSecret(), dictService.getOwners())) {
+		if (isNewSession) {
+			if (loginUtil.verifyJwt(message, dictService.getSecret(), dictService.getOwners())) {
 				System.out.println("DrawWebsocket: Token valid");
 				isNewSession = false;
 			} else {
@@ -56,7 +57,7 @@ public class DrawWebsocket {
 		endpoints.forEach(endpoint -> {
 			synchronized (endpoint) {
 				try {
-					if(!endpoint.equals(this))
+					if (!endpoint.equals(this))
 						endpoint.session.getBasicRemote().sendText(message);
 				} catch (IOException e) {
 					e.printStackTrace();

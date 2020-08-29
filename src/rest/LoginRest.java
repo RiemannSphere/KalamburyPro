@@ -13,14 +13,14 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import db.AppDictionaryService;
 import db.PasswordService;
 import db.UserService;
-import exception.GameIntegrityViolationException;
 import model.Credentials;
 import model.Password;
-import model.User;
 import service.LoginUtil;
 
 /**
- * @author Maciej Szaba³a
+ * Login REST endpoint
+ * 
+ * @author Piotr Ko³odziejski
  */
 @Path("/login")
 public class LoginRest {

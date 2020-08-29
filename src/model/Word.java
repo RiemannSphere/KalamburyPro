@@ -9,27 +9,28 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 /**
+ * Word to guess
  * 
- * @author Piotr Ko³odziejski
+ * @author Maciej Szaba³a
  *
  */
 @Entity
-@Table(name="slowa")
+@Table(name = "slowa")
 public class Word {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="id")
+	@Column(name = "id")
 	@NotNull
 	private Long id;
-	
-	@Column(name="slowo")
+
+	@Column(name = "slowo")
 	@NotNull
 	private String word;
 
 	public Word() {
 	}
-	
+
 	public Word(String word) {
 		this.word = word;
 	}
@@ -49,5 +50,5 @@ public class Word {
 	public void setWord(String word) {
 		this.word = word;
 	}
-	
+
 }

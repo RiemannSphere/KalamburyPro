@@ -8,35 +8,35 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 /**
+ * Active user
  * 
  * @author Piotr Ko³odziejski
  */
 @Entity
-@Table(name="u¿ytkownicy_aktywni")
+@Table(name = "u¿ytkownicy_aktywni")
 public class ActiveUser {
 
 	@Id
-	@GeneratedValue( strategy= GenerationType.AUTO )
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long idau;
-	
-	@Column(name="rysuje")
+
+	@Column(name = "rysuje")
 	private Boolean isDrawing;
-	
-	@Column(name="rysowane_s³owo")
+
+	@Column(name = "rysowane_s³owo")
 	private String word;
-	
-	@Column(name="id_sesji")
+
+	@Column(name = "id_sesji")
 	private String chatSessionId;
-	
+
 	@OneToOne
-	@JoinColumn(name="idu")
-	private User user; 
-	
+	@JoinColumn(name = "idu")
+	private User user;
+
 	public ActiveUser() {
-		
+
 	}
 
 	public Long getIdau() {
@@ -70,11 +70,11 @@ public class ActiveUser {
 	public void setChatSessionId(String chatSessionId) {
 		this.chatSessionId = chatSessionId;
 	}
-	
+
 	public String getWord() {
 		return word;
 	}
-	
+
 	public void setWord(String word) {
 		this.word = word;
 	}

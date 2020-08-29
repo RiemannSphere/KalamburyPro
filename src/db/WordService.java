@@ -4,9 +4,15 @@ import java.util.Random;
 
 import exception.GameIntegrityViolationException;
 import model.Word;
-import service.GameUtil;
 
-public class WordService {
+/**
+ * This class is responsible for interacting with table containing words to
+ * guess in database.
+ * 
+ * @author Maciej Szaba³a
+ *
+ */
+public class WordService implements AutoCloseable {
 
 	private Database db = Database.getInstance();
 
@@ -26,7 +32,13 @@ public class WordService {
 			instance = new WordService();
 		return instance;
 	}
-	
+
+	/**
+	 * 
+	 * @return random word from database
+	 * @throws GameIntegrityViolationException in case of error during word
+	 *                                         generation
+	 */
 	public String getRandomWord() throws GameIntegrityViolationException {
 		try {
 			// Min ID
@@ -50,5 +62,10 @@ public class WordService {
 		} catch (Exception e) {
 			throw new GameIntegrityViolationException("WordService error during next word generation.");
 		}
+	}
+
+	@Override
+	public void close() throws Exception {
+		db.close();
 	}
 }

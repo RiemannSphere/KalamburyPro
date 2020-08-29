@@ -2,7 +2,6 @@ package db;
 
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.NoResultException;
@@ -15,6 +14,13 @@ import model.Score;
 import model.User;
 import service.GameUtil;
 
+/**
+ * This class is responsible for interacting with table containing active users
+ * in database. It it a singleton and is meant to be injected as a field i.e.
+ * private ActiveUserService as = ActiveUserService.getInstance();
+ * 
+ * @author Piotr Ko³odziejski
+ */
 public class ActiveUserService implements AutoCloseable {
 
 	private Database db = Database.getInstance();
@@ -39,6 +45,8 @@ public class ActiveUserService implements AutoCloseable {
 	}
 
 	/**
+	 * Checks if user with given session id exists in active users table in db.
+	 * 
 	 * @param sessionId id of a websocket session
 	 * @return true if user exists in ActiveUser table, false otherwise
 	 * @throws GameIntegrityViolationException in case of inconsistency in database
@@ -64,8 +72,6 @@ public class ActiveUserService implements AutoCloseable {
 	 * 
 	 * @param username      User to be set as active
 	 * @param chatSessionId User's session id
-	 * @return false if something went wrong e.g. user does not exist, transaction
-	 *         failed
 	 * @throws GameIntegrityViolationException user does not exist or is not unique
 	 */
 	public void addActiveUser(String username, String chatSessionId) throws GameIntegrityViolationException {
@@ -90,6 +96,11 @@ public class ActiveUserService implements AutoCloseable {
 
 	}
 
+	/**
+	 * Removes user with given session id from active users table in db.
+	 * 
+	 * @param sessionId User's session id
+	 */
 	public void removeActiveUser(String sessionId) {
 		ActiveUser user = null;
 		try {
@@ -105,6 +116,7 @@ public class ActiveUserService implements AutoCloseable {
 	}
 
 	/**
+	 * Produces scoreboard for given list or users.
 	 * 
 	 * @return list of active users and their points
 	 */
@@ -113,6 +125,8 @@ public class ActiveUserService implements AutoCloseable {
 	}
 
 	/**
+	 * Checks if there is a drawing user among active users in db.
+	 * 
 	 * @return true is drawing user exists, false otherwise
 	 * @throws GameIntegrityViolationException if there is more than one drawing
 	 *                                         user
@@ -130,6 +144,8 @@ public class ActiveUserService implements AutoCloseable {
 	}
 
 	/**
+	 * Compares given word to the current word to guess stored in a db.
+	 * 
 	 * @param word to be compared with current word to guess
 	 * @return true if words are equal after trim and to upper case, false otherwise
 	 * @throws GameIntegrityViolationException when there is zero or more than one
@@ -151,6 +167,8 @@ public class ActiveUserService implements AutoCloseable {
 	}
 
 	/**
+	 * Selects currently drawing user from db.
+	 * 
 	 * @return active drawing user
 	 * @throws GameIntegrityViolationException when there is zero or more than one
 	 *                                         drawing user
@@ -167,6 +185,8 @@ public class ActiveUserService implements AutoCloseable {
 	}
 
 	/**
+	 * Selects all the active users from db.
+	 * 
 	 * @return all active users
 	 */
 	public List<ActiveUser> getActiveUsers() {
@@ -174,6 +194,7 @@ public class ActiveUserService implements AutoCloseable {
 	}
 
 	/**
+	 * Adds given number of points to the active user with given session id.
 	 * 
 	 * @param chatSessionId user session id to which add points
 	 * @param points        number of points to be added
@@ -212,6 +233,8 @@ public class ActiveUserService implements AutoCloseable {
 	}
 
 	/**
+	 * Selects random active user from db.
+	 * 
 	 * @return random active user
 	 */
 	public ActiveUser getRandomActiveUser() {
@@ -240,6 +263,10 @@ public class ActiveUserService implements AutoCloseable {
 	}
 
 	/**
+	 * At first it resets state of all active users to not drawing. It also resets
+	 * all the words to null. After that this method sets new drawing user and new
+	 * word to guess.
+	 * 
 	 * @param user to be set as drawing
 	 * @param word new word to guess
 	 * @throws GameIntegrityViolationException when either user is null or word is
@@ -268,7 +295,9 @@ public class ActiveUserService implements AutoCloseable {
 	}
 
 	/**
-	 * @param sessionId
+	 * Selects active user by his session id from db.
+	 * 
+	 * @param sessionId session id
 	 * @return active user
 	 * @throws GameIntegrityViolationException in case session id is null, empty or
 	 *                                         blank
@@ -288,6 +317,9 @@ public class ActiveUserService implements AutoCloseable {
 		}
 	}
 
+	/**
+	 * On close of the object makes sure to close the db connection.
+	 */
 	@Override
 	public void close() throws Exception {
 		db.close();

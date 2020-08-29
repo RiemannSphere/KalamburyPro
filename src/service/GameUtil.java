@@ -7,6 +7,11 @@ import exception.InvalidWordException;
 import model.ActiveUser;
 import model.Score;
 
+/**
+ * Helpful methods
+ * 
+ * @author Piotr Ko³odziejski
+ */
 public class GameUtil {
 
 	private static GameUtil instance;
@@ -26,13 +31,13 @@ public class GameUtil {
 	}
 
 	/**
-	 * @param word
-	 * @return true if word is null, empty or blank, false otherwise 
+	 * @param word word to be validated
+	 * @return true if word is null, empty or blank, false otherwise
 	 */
 	public boolean isWordInvalid(String word) {
 		return word == null || word.isEmpty() || word.trim().isEmpty();
 	}
-	
+
 	/**
 	 * Comparison is not case sensitive and does not care about whitespaces around
 	 * 
@@ -53,6 +58,7 @@ public class GameUtil {
 
 	/**
 	 * Produces scoreboard for given users
+	 * 
 	 * @param users list of active users
 	 * @return list of scores for given users
 	 */

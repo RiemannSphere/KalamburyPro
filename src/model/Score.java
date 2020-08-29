@@ -1,13 +1,18 @@
 package model;
 
+/**
+ * Element of displayed scoreboard.
+ * 
+ * @author Maciej Szaba³a
+ */
 public class Score {
-	
+
 	private String username;
 	private Boolean isDrawing;
 	private Integer points;
 
 	public Score() {
-		
+
 	}
 
 	public Score(String username, Boolean isDrawing, Integer points) {
@@ -39,5 +44,5 @@ public class Score {
 	public void setPoints(Integer points) {
 		this.points = points;
 	}
-	
+
 }

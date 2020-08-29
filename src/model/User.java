@@ -6,32 +6,32 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
 
 /**
+ * Signed up user
  * 
  * @author Maciej Szaba³a
+ *
  */
 @Entity
-@Table(name="u¿ytkownicy")
+@Table(name = "u¿ytkownicy")
 public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="idu")
+	@Column(name = "idu")
 	private Long id;
-	
-	@Column(name="nazwa")
+
+	@Column(name = "nazwa")
 	private String username;
-	
-	@Column(name="punkty")
+
+	@Column(name = "punkty")
 	private Integer points;
 
 	public User() {
-	
+
 	}
-	
+
 	public User(Long id) {
 		this.id = id;
 	}
@@ -59,5 +59,5 @@ public class User {
 	public void setPoints(Integer points) {
 		this.points = points;
 	}
-	
+
 }

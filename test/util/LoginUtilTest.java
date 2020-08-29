@@ -8,6 +8,11 @@ import org.opentest4j.AssertionFailedError;
 import exception.GameIntegrityViolationException;
 import service.LoginUtil;
 
+/**
+ * 
+ * @author Maciej Szaba³a
+ *
+ */
 class LoginUtilTest {
 
 	/**

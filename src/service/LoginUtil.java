@@ -21,6 +21,11 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 import exception.GameIntegrityViolationException;
 
+/**
+ * Methods used during authentication
+ * 
+ * @author Piotr Ko³odziejski
+ */
 public class LoginUtil {
 
 	private static LoginUtil instance;
@@ -44,7 +49,7 @@ public class LoginUtil {
 	 * expiration date or owner.
 	 * 
 	 * @param username name for which create the token
-	 * @param secret
+	 * @param secret   secret for signing the token
 	 * @param expTime  in milliseconds
 	 * @param owners   of an app
 	 * @return signed token
@@ -147,9 +152,10 @@ public class LoginUtil {
 		// Compare hashes
 		return Arrays.equals(hashGenerated, hash);
 	}
-	
+
 	/**
 	 * Appends default headers to the server response.
+	 * 
 	 * @param rb response to which append the headers
 	 * @return response with appended headers
 	 */

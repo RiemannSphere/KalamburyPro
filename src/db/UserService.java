@@ -1,9 +1,5 @@
 package db;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 
@@ -12,7 +8,14 @@ import model.Password;
 import model.User;
 import service.LoginUtil;
 
-public class UserService {
+/**
+ * This class is responsible for interacting with table containing all ever
+ * signed up users in database.
+ * 
+ * @author Maciej Szaba³a
+ *
+ */
+public class UserService implements AutoCloseable {
 
 	private LoginUtil loginUtil = LoginUtil.getInstance();
 	private Database db;
@@ -35,7 +38,7 @@ public class UserService {
 	}
 
 	/**
-	 * @param username
+	 * @param username username
 	 * @return user object
 	 * @throws GameIntegrityViolationException user does not exist or is not unique
 	 */
@@ -51,7 +54,7 @@ public class UserService {
 	}
 
 	/**
-	 * @param username
+	 * @param username username
 	 * @return true if user exists in db
 	 * @throws GameIntegrityViolationException in case user is not unique in db
 	 */
@@ -72,8 +75,8 @@ public class UserService {
 	 * salt for given user and stores it in db. Hashes the password and stores it in
 	 * db.
 	 * 
-	 * @param username
-	 * @param password
+	 * @param username username
+	 * @param password password
 	 * @throws GameIntegrityViolationException if pbkdf2 was implemented incorrectly
 	 */
 	public void createNewUser(String username, String password) throws GameIntegrityViolationException {
@@ -100,6 +103,11 @@ public class UserService {
 		db.em().persist(pass);
 
 		db.em().getTransaction().commit();
+	}
+
+	@Override
+	public void close() throws Exception {
+		db.close();
 	}
 
 }

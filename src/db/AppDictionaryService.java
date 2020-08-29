@@ -5,7 +5,13 @@ import javax.persistence.NonUniqueResultException;
 
 import exception.GameIntegrityViolationException;
 
-public class AppDictionaryService {
+/**
+ * This class is responsible for interacting with table containing app
+ * constances in database.
+ * 
+ * @author Piotr Ko³odziejski
+ */
+public class AppDictionaryService implements AutoCloseable {
 
 	private Database db = Database.getInstance();
 
@@ -48,21 +54,22 @@ public class AppDictionaryService {
 	public long getExpirationTime() throws GameIntegrityViolationException {
 		try {
 			return Long.parseLong(getValueForKey("EXP_TIME_MILLIS"));
-		} catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			throw new GameIntegrityViolationException("Expiration time is not of type long. Error in db.", e);
-		} 
+		}
 	}
-	
+
 	/**
 	 * @return number of retries
-	 * @throws GameIntegrityViolationException key does not exist or is not unique, also when value is not an integer
+	 * @throws GameIntegrityViolationException key does not exist or is not unique,
+	 *                                         also when value is not an integer
 	 */
 	public int getNumberOfRetries() throws GameIntegrityViolationException {
 		try {
 			return Integer.parseInt(getValueForKey("NUM_OF_RETRY"));
-		} catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			throw new GameIntegrityViolationException("Number of retries is not an integer. Error in db.", e);
-		} 
+		}
 	}
 
 	/**
@@ -72,11 +79,11 @@ public class AppDictionaryService {
 	public int getRetryFrequency() throws GameIntegrityViolationException {
 		try {
 			return Integer.parseInt(getValueForKey("RETRY_FREQ_IN_MILLIS"));
-		} catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			throw new GameIntegrityViolationException("Retry frequency is not an integer. Error in db.", e);
-		} 
+		}
 	}
-	
+
 	/**
 	 * 
 	 * @param key key in dictionary table
@@ -92,6 +99,11 @@ public class AppDictionaryService {
 		} catch (NonUniqueResultException e) {
 			throw new GameIntegrityViolationException("Key is not unique in the dictionary!", e);
 		}
+	}
+
+	@Override
+	public void close() throws Exception {
+		db.close();
 	}
 
 }

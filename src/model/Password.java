@@ -8,34 +8,35 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 /**
+ * Password in form of hash and its salt.
  * 
- * @author Piotr Ko³odziejski
+ * @author Maciej Szaba³a
+ *
  */
 @Entity
-@Table(name="has³a")
+@Table(name = "has³a")
 public class Password {
 
 	@Id
-	@GeneratedValue( strategy= GenerationType.AUTO ) 
-	@Column(name="idp")
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "idp")
 	private Long id;
-	
+
 	@Lob
-	@Column(name="sól", length=16)
+	@Column(name = "sól", length = 16)
 	private byte[] salt;
-	
+
 	@Lob
-	@Column(name="hash", length=128)
+	@Column(name = "hash", length = 128)
 	private byte[] hash;
-	
+
 	@OneToOne
 	private User user;
-	
+
 	public Password() {
-		
+
 	}
 
 	public Long getId() {
@@ -69,5 +70,5 @@ public class Password {
 	public void setUser(User user) {
 		this.user = user;
 	}
-	
+
 }

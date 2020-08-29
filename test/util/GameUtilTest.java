@@ -7,6 +7,10 @@ import org.junit.jupiter.api.Test;
 import exception.InvalidWordException;
 import service.GameUtil;
 
+/**
+ * 
+ * @author Maciej Szaba³a
+ */
 class GameUtilTest {
 
 	/**
